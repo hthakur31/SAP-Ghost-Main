@@ -1,0 +1,2028 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOST - Detection History</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'premium-gold': '#FFD700',
+                        'deep-navy': '#1A1A40',
+                        'charcoal': '#222222',
+                        'soft-white': '#FFFFFF',
+                        'light-gray': '#F8F9FA',
+                        'border-gray': '#E5E7EB'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F1F3F6;
+        }
+        
+        .header-card {
+            background: linear-gradient(135deg, #1A1A40 0%, #2A2A60 100%);
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .filter-section {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .table-header {
+            background: #1A1A40;
+            color: white;
+        }
+        
+        .badge-verified { 
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-suspicious { 
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-fraudulent { 
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .plan-freemium {
+            background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .plan-premium {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #1A1A40;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .plan-enterprise {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .confidence-progress {
+            background: #E5E7EB;
+            border-radius: 8px;
+            height: 6px;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 8px;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            background: #F3F4F6;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-fraudulent { 
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .confidence-progress {
+            width: 100%;
+            height: 6px;
+            background-color: #E5E7EB;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10B981 0%, #34D399 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .plan-freemium {
+            background: #F3F4F6;
+            color: #6B7280;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .plan-premium {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #1A1A40;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .plan-enterprise {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .pagination a, .pagination span {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            color: #374151;
+            transition: all 0.2s;
+            background: white;
+        }
+        
+        .pagination a:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+        
+        .pagination .current {
+            background: #1A1A40;
+            color: white;
+            border-color: #1A1A40;
+        }
+        
+        .icon-deepfake { color: #3B82F6; }
+        .icon-voice { color: #10B981; }
+        .icon-fraud { color: #EF4444; }
+        .icon-otp { color: #8B5CF6; }
+        
+        .action-btn {
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+        }
+        
+        .action-btn:hover {
+            background: #F3F4F6;
+        }
+
+        /* Ghost Loader Styles */
+        .ghost-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a40 50%, #2d2d5f 100%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+        }
+
+        .ghost-loader.show {
+            display: flex;
+        }
+
+        .ghost-loader-content {
+            text-align: center;
+            color: white;
+        }
+
+        .ghost-logo {
+            margin-bottom: 20px;
+        }
+
+        .ghost-symbol {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+            animation: ghostPulse 2s ease-in-out infinite;
+        }
+
+        .ghost-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+            animation: ghostRotate 3s linear infinite;
+            position: relative;
+        }
+
+        .ghost-circle::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60px;
+            height: 60px;
+            background: #0f0f23;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .ghost-eye {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            top: 35%;
+            animation: ghostBlink 3s infinite;
+        }
+
+        .ghost-eye.left {
+            left: 30%;
+        }
+
+        .ghost-eye.right {
+            right: 30%;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+
+        .loading-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: dotBounce 1.5s infinite;
+        }
+
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes ghostPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes ghostRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes ghostBlink {
+            0%, 90%, 100% { opacity: 1; }
+            95% { opacity: 0; }
+        }
+
+        @keyframes textGlow {
+            from { opacity: 0.8; }
+            to { opacity: 1; }
+        }
+
+        @keyframes dotBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .ghost-loader.fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Ghost Loader -->
+    <div id="ghost-loader" class="ghost-loader">
+        <div class="ghost-loader-content">
+            <div class="ghost-logo">
+                <div class="ghost-symbol">
+                    <div class="ghost-circle"></div>
+                    <div class="ghost-eye left"></div>
+                    <div class="ghost-eye right"></div>
+                </div>
+            </div>
+            <div class="loading-text">GHOST ANALYZING</div>
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    {% include 'partials/header.html' %}
+    
+    <!-- Main Content -->
+    <div class="min-h-screen pt-20 pb-8" style="background: #F1F3F6;">
+        <div class="container mx-auto px-6 max-w-7xl">
+            
+            <!-- Page Header -->
+            <div class="header-card p-8 mb-8">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">Detection History</h1>
+                        <p class="text-gray-300 text-lg">Comprehensive analysis dashboard for all your security scans and AI-powered detections</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="{% url 'export_history_pdf' %}" class="bg-premium-gold text-deep-navy px-6 py-3 rounded-lg font-semibold hover:bg-yellow-400 transition flex items-center gap-2" onclick="GhostLoader.show('GENERATING PDF'); showNotification('Preparing PDF export...', 'info'); setTimeout(() => GhostLoader.hide(), 2000);">
+                            <i class="fas fa-file-pdf"></i>
+                            Export as PDF
+                        </a>
+                        <a href="{% url 'export_history_excel' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2" onclick="GhostLoader.show('GENERATING EXCEL'); showNotification('Preparing Excel export...', 'info'); setTimeout(() => GhostLoader.hide(), 2000);">
+                            <i class="fas fa-file-excel"></i>
+                            Export as Excel
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
+                <div class="stats-card p-6 text-center">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-yellow-600 text-xl"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800 mb-1">{{ total_scans }}</div>
+                    <div class="text-sm text-gray-600 font-medium">Total Scans</div>
+                </div>
+                
+                <div class="stats-card p-6 text-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800 mb-1">{{ authentic_content }}</div>
+                    <div class="text-sm text-gray-600 font-medium">Authentic Content</div>
+                </div>
+                
+                <div class="stats-card p-6 text-center">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800 mb-1">{{ deepfakes_detected }}</div>
+                    <div class="text-sm text-gray-600 font-medium">Deepfakes Detected</div>
+                </div>
+                
+                <div class="stats-card p-6 text-center">
+                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-shield text-orange-600 text-xl"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800 mb-1">{{ suspicious_items }}</div>
+                    <div class="text-sm text-gray-600 font-medium">Suspicious Items</div>
+                </div>
+                
+                <div class="stats-card p-6 text-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-percentage text-blue-600 text-xl"></i>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-800 mb-1">{{ accuracy_rate }}%</div>
+                    <div class="text-sm text-gray-600 font-medium">Accuracy Rate</div>
+                </div>
+            </div>
+            
+            <!-- Filters Section -->
+            <div class="filter-section p-6 mb-8">
+                <form method="GET" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <!-- Search -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                            <div class="relative">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                                <input type="text" name="search" value="{{ search_query }}" 
+                                       placeholder="Search by Request ID or Analysis Type..." 
+                                       class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <!-- Analysis Type -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Analysis Type</label>
+                            <select name="analysis_type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="all" {% if analysis_type == 'all' %}selected{% endif %}>All Types</option>
+                                <option value="deepfake" {% if analysis_type == 'deepfake' %}selected{% endif %}>Deepfake Detection</option>
+                                <option value="voice" {% if analysis_type == 'voice' %}selected{% endif %}>Voice Authentication</option>
+                                <option value="fraud" {% if analysis_type == 'fraud' %}selected{% endif %}>Fraud Detection</option>
+                                <option value="otp" {% if analysis_type == 'otp' %}selected{% endif %}>OTP Verification</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Result -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Result</label>
+                            <select name="result" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="all">All Results</option>
+                                <option value="verified">Verified</option>
+                                <option value="authentic">Authentic</option>
+                                <option value="suspicious">Suspicious</option>
+                                <option value="fraudulent">Fraudulent</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Date From -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date From</label>
+                            <input type="date" name="date_from" value="{{ date_from }}" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        
+                        <!-- Date To -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Date To</label>
+                            <input type="date" name="date_to" value="{{ date_to }}" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                            <i class="fas fa-filter"></i>
+                            Apply Filters
+                        </button>
+                        <a href="{% url 'history' %}" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition flex items-center gap-2">
+                            <i class="fas fa-times"></i>
+                            Clear Filters
+                        </a>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Export Buttons -->
+            <div class="filter-section p-4 mb-6">
+                <div class="flex justify-between items-center">
+                    <div class="flex gap-3">
+                        <button onclick="exportCSV()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2" title="Export current view as CSV">
+                            <i class="fas fa-download"></i>
+                            Export CSV
+                        </button>
+                        <button onclick="exportExcel()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2" title="Export current view as Excel">
+                            <i class="fas fa-file-excel"></i>
+                            Export Excel
+                        </button>
+                        <button onclick="exportPDF()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center gap-2" title="Export current view as PDF">
+                            <i class="fas fa-file-pdf"></i>
+                            Export PDF
+                        </button>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} entries
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results Table -->
+            <div class="table-container">
+                <!-- Table Header -->
+                <div class="table-header px-6 py-4">
+                    <div class="grid grid-cols-7 gap-4 font-semibold text-sm">
+                        <div class="text-left">Request</div>
+                        <div class="text-left">Timestamp</div>
+                        <div class="text-left">Analysis Type</div>
+                        <div class="text-left">Result</div>
+                        <div class="text-left">Confidence</div>
+                        <div class="text-left">Subscription Plan</div>
+                        <div class="text-left">Actions</div>
+                    </div>
+                </div>
+                
+                <!-- Table Body -->
+                <div class="bg-white" id="historyTableBody">
+                    <!-- Dynamic content will be loaded here -->
+                    <div id="loadingSpinner" class="px-6 py-12 text-center">
+                        <i class="fas fa-spinner fa-spin text-4xl mb-4 text-blue-500"></i>
+                        <h3 class="text-lg font-medium mb-2">Loading Detection History...</h3>
+                        <p class="text-gray-500">Please wait while we fetch your analysis data.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="pagination mt-8">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.analysis_type %}&analysis_type={{ request.GET.analysis_type }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">Previous</a>
+                {% endif %}
+                
+                <span class="current">
+                    {{ page_obj.number }}
+                </span>
+                
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.analysis_type %}&analysis_type={{ request.GET.analysis_type }}{% endif %}{% if request.GET.date_from %}&date_from={{ request.GET.date_from }}{% endif %}{% if request.GET.date_to %}&date_to={{ request.GET.date_to }}{% endif %}">Next</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    {% include 'partials/footer.html' %}
+    
+    <script>
+        // Ghost Loader Functions
+        window.GhostLoader = {
+            show: function(text = 'GHOST ANALYZING') {
+                const loader = document.getElementById('ghost-loader');
+                const loadingText = loader.querySelector('.loading-text');
+                if (loadingText) {
+                    loadingText.textContent = text;
+                }
+                loader.classList.remove('fade-out');
+                loader.classList.add('show');
+            },
+            
+            hide: function() {
+                const loader = document.getElementById('ghost-loader');
+                loader.classList.add('fade-out');
+                setTimeout(() => {
+                    loader.classList.remove('show', 'fade-out');
+                }, 500);
+            }
+        };
+
+        // Global variables
+        let historyData = [];
+        let refreshInterval;
+        let lastUpdateTime = null;
+        
+        // Set confidence bar widths on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('History page loaded - initializing...');
+            loadDetectionHistory();
+            startAutoRefresh();
+            setupCrossPageListeners();
+            
+            // Update confidence bars after dynamic loading
+            setTimeout(updateConfidenceBars, 1000);
+        });
+        
+        function setupCrossPageListeners() {
+            // Listen for localStorage changes (cross-tab communication)
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'ghostHistoryUpdate') {
+                    console.log('Received history update notification from another tab');
+                    const updateData = JSON.parse(e.newValue);
+                    if (updateData && updateData.type === 'HISTORY_UPDATE') {
+                        setTimeout(() => {
+                            loadDetectionHistory();
+                            showNotification('New analysis detected! Refreshing history...', 'info');
+                        }, 2000); // Wait 2 seconds to ensure database is updated
+                    }
+                }
+            });
+            
+            // Listen for window messages (same-page communication)
+            window.addEventListener('message', function(e) {
+                if (e.data && e.data.type === 'HISTORY_UPDATE') {
+                    console.log('Received history update notification from same page');
+                    setTimeout(() => {
+                        loadDetectionHistory();
+                        showNotification('Analysis complete! Refreshing history...', 'info');
+                    }, 2000);
+                }
+            });
+        }
+        
+        function updateConfidenceBars() {
+            document.querySelectorAll('.confidence-fill').forEach(bar => {
+                const width = bar.getAttribute('data-width');
+                bar.style.width = width + '%';
+            });
+        }
+        
+        async function loadDetectionHistory() {
+            try {
+                console.log('Loading all detection history...');
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                const tableBody = document.getElementById('historyTableBody');
+                
+                // Show Ghost Loader
+                GhostLoader.show('LOADING HISTORY');
+                if (loadingSpinner) loadingSpinner.style.display = 'block';
+                
+                const response = await fetch('/api/all-detection-history/', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await response.json();
+                console.log('History API response:', data);
+
+                if (data.success) {
+                    historyData = data.detections;
+                    renderHistoryTable(historyData);
+                    updateStats(historyData);
+                    lastUpdateTime = new Date();
+                    
+                    console.log(`Loaded ${historyData.length} detection records`);
+                    
+                    // Show success notification if this is a refresh
+                    if (window.historyPageRefreshCount > 0) {
+                        showNotification(`History updated! Total detections: ${historyData.length}`, 'success');
+                    }
+                    window.historyPageRefreshCount = (window.historyPageRefreshCount || 0) + 1;
+                } else {
+                    console.error('History API returned error:', data.error);
+                    showErrorMessage('Failed to load detection history');
+                }
+                
+                // Hide Ghost Loader and loading spinner
+                GhostLoader.hide();
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Failed to load history:', error);
+                showErrorMessage('Error loading detection history');
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                if (loadingSpinner) loadingSpinner.style.display = 'none';
+                GhostLoader.hide();
+            }
+        }
+        
+        function renderHistoryTable(detections) {
+            const tableBody = document.getElementById('historyTableBody');
+            
+            if (!detections || detections.length === 0) {
+                tableBody.innerHTML = `
+                    <div class="px-6 py-12 text-center text-gray-500">
+                        <i class="fas fa-search text-4xl mb-4 text-gray-300"></i>
+                        <h3 class="text-lg font-medium mb-2">No detections found</h3>
+                        <p>Start analyzing content to see your detection history here.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let tableHTML = '';
+            
+            detections.forEach(detection => {
+                const confidenceWidth = Math.round(detection.confidence_score || 0);
+                
+                // Fix timezone handling - convert UTC to local time
+                let dateObj;
+                if (detection.timestamp) {
+                    // Use the ISO timestamp if available
+                    dateObj = new Date(detection.timestamp);
+                } else if (detection.created_at) {
+                    // Fallback to created_at field, assuming it's in UTC
+                    dateObj = new Date(detection.created_at + ' UTC');
+                } else {
+                    dateObj = new Date();
+                }
+                
+                // Format date and time properly for local timezone
+                const formattedDate = dateObj.toLocaleDateString('en-US', { 
+                    weekday: 'short',
+                    month: 'short', 
+                    day: 'numeric', 
+                    year: 'numeric',
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                });
+                
+                const formattedTime = dateObj.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true,
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                });
+                
+                // Add relative time for better UX
+                const now = new Date();
+                const timeDiff = now - dateObj;
+                let relativeTime = '';
+                
+                if (timeDiff < 60000) { // Less than 1 minute
+                    relativeTime = 'Just now';
+                } else if (timeDiff < 3600000) { // Less than 1 hour
+                    const minutes = Math.floor(timeDiff / 60000);
+                    relativeTime = `${minutes} min ago`;
+                } else if (timeDiff < 86400000) { // Less than 24 hours
+                    const hours = Math.floor(timeDiff / 3600000);
+                    relativeTime = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                } else if (timeDiff < 604800000) { // Less than 7 days
+                    const days = Math.floor(timeDiff / 86400000);
+                    relativeTime = `${days} day${days > 1 ? 's' : ''} ago`;
+                } else {
+                    relativeTime = formattedDate;
+                }
+                
+                // Determine icon and colors based on analysis type
+                let iconConfig = getAnalysisTypeConfig(detection.type);
+                let badgeConfig = getResultBadgeConfig(detection.result, detection.status);
+                
+                tableHTML += `
+                    <div class="grid grid-cols-7 gap-4 px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition items-center text-sm">
+                        <!-- Request ID -->
+                        <div class="font-mono text-gray-600">
+                            #${detection.type.toUpperCase()}-${String(detection.id).padStart(4, '0')}
+                        </div>
+                        
+                        <!-- Timestamp -->
+                        <div class="text-gray-700 cursor-help" title="Exact time: ${dateObj.toString()}">
+                            <div class="font-medium text-sm">${formattedDate}</div>
+                            <div class="text-xs text-gray-500">${formattedTime}</div>
+                            <div class="text-xs text-blue-600 mt-1 font-medium" data-timestamp="${detection.timestamp || detection.created_at_iso || detection.created_at}">${relativeTime}</div>
+                        </div>
+                        
+                        <!-- Analysis Type -->
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 ${iconConfig.bgColor} rounded-full flex items-center justify-center">
+                                <i class="fas ${iconConfig.icon} text-sm"></i>
+                            </div>
+                            <span class="font-medium">${detection.analysis_type}</span>
+                        </div>
+                        
+                        <!-- Result -->
+                        <div>
+                            <span class="${badgeConfig.class}">
+                                <i class="fas ${badgeConfig.icon} mr-1"></i>${detection.result}
+                            </span>
+                        </div>
+                        
+                        <!-- Confidence -->
+                        <div class="flex items-center gap-3">
+                            <div class="confidence-progress w-16">
+                                <div class="confidence-fill" data-width="${confidenceWidth}" style="width: ${confidenceWidth}%"></div>
+                            </div>
+                            <span class="font-medium text-gray-700">${detection.confidence_score.toFixed(1)}%</span>
+                        </div>
+                        
+                        <!-- Subscription Plan -->
+                        <div>
+                            <span class="plan-freemium">DEMO</span>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex gap-1">
+                            <button onclick="viewDetectionDetails(${detection.id}, '${detection.type}')" class="action-btn text-blue-600 hover:text-blue-800" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button onclick="downloadDetectionReport(${detection.id}, '${detection.type}')" class="action-btn text-green-600 hover:text-green-800" title="Download Report">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button onclick="shareReport('${detection.id}')" class="action-btn text-purple-600 hover:text-purple-800" title="Share Report">
+                                <i class="fas fa-share"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            tableBody.innerHTML = tableHTML;
+            updateConfidenceBars();
+        }
+        
+        function getAnalysisTypeConfig(type) {
+            const configs = {
+                'deepfake': { icon: 'fa-user-check', bgColor: 'bg-blue-100' },
+                'voice': { icon: 'fa-microphone', bgColor: 'bg-green-100' },
+                'fraud': { icon: 'fa-shield-alt', bgColor: 'bg-red-100' },
+                'otp': { icon: 'fa-key', bgColor: 'bg-purple-100' }
+            };
+            return configs[type] || { icon: 'fa-search', bgColor: 'bg-gray-100' };
+        }
+        
+        function getResultBadgeConfig(result, status) {
+            const resultLower = result.toLowerCase();
+            const statusLower = status.toLowerCase();
+            
+            if (resultLower.includes('authentic') || resultLower.includes('legitimate') || statusLower === 'safe') {
+                return { class: 'badge-authentic', icon: 'fa-shield-check' };
+            } else if (resultLower.includes('deepfake') || resultLower.includes('fraudulent') || statusLower === 'threat') {
+                return { class: 'badge-fraudulent', icon: 'fa-exclamation-triangle' };
+            } else if (resultLower.includes('suspicious')) {
+                return { class: 'badge-suspicious', icon: 'fa-exclamation-triangle' };
+            } else if (resultLower.includes('rejected')) {
+                return { class: 'badge-fraudulent', icon: 'fa-ban' };
+            } else {
+                return { class: 'badge-verified', icon: 'fa-check' };
+            }
+        }
+        
+        function updateStats(detections) {
+            // Update statistics on the page
+            const totalScans = detections.length;
+            const authenticContent = detections.filter(d => d.status === 'SAFE').length;
+            const threats = detections.filter(d => d.status === 'THREAT').length;
+            
+            // Update DOM elements if they exist
+            const totalElement = document.querySelector('.stats-card:nth-child(1) .text-2xl');
+            const authenticElement = document.querySelector('.stats-card:nth-child(2) .text-2xl');
+            const threatsElement = document.querySelector('.stats-card:nth-child(3) .text-2xl');
+            
+            if (totalElement) totalElement.textContent = totalScans;
+            if (authenticElement) authenticElement.textContent = authenticContent;
+            if (threatsElement) threatsElement.textContent = threats;
+        }
+        
+        function startAutoRefresh() {
+            // Refresh every 30 seconds
+            refreshInterval = setInterval(() => {
+                console.log('Auto-refreshing history data...');
+                loadDetectionHistory();
+            }, 30000);
+        }
+        
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+        
+        // Download report function
+        async function downloadDetectionReport(logId, reportType) {
+            try {
+                showNotification('Generating analysis report...', 'info');
+                
+                const downloadUrl = `/api/report/download/${logId}/${reportType}/`;
+                
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = `ghost_${reportType}_report_${logId}_${new Date().toISOString().slice(0, 10)}.pdf`;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showNotification('Report download initiated!', 'success');
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                showNotification('Failed to download report. Please try again.', 'error');
+            }
+        }
+        
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${getNotificationClass(type)}`;
+            notification.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas ${getNotificationIcon(type)} mr-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+        
+        function getNotificationClass(type) {
+            const classes = {
+                'success': 'bg-green-500 text-white',
+                'error': 'bg-red-500 text-white',
+                'warning': 'bg-yellow-500 text-white',
+                'info': 'bg-blue-500 text-white'
+            };
+            return classes[type] || classes.info;
+        }
+        
+        function getNotificationIcon(type) {
+            const icons = {
+                'success': 'fa-check-circle',
+                'error': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+            return icons[type] || icons.info;
+        }
+        
+        function showErrorMessage(message) {
+            const tableBody = document.getElementById('historyTableBody');
+            tableBody.innerHTML = `
+                <div class="px-6 py-12 text-center text-red-500">
+                    <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                    <h3 class="text-lg font-medium mb-2">Error Loading History</h3>
+                    <p>${message}</p>
+                    <button onclick="loadDetectionHistory()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Try Again
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            stopAutoRefresh();
+        });
+        
+        function viewDetails(requestId) {
+            // Show loading state
+            const button = event.target.closest('button');
+            const originalIcon = button.querySelector('i').className;
+            button.querySelector('i').className = 'fas fa-spinner fa-spin';
+            button.disabled = true;
+            
+            // Fetch and display details
+            fetch(`/api/detection/${requestId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    // Restore button state
+                    button.querySelector('i').className = originalIcon;
+                    button.disabled = false;
+                    
+                    if (data.error) {
+                        alert('Error: ' + data.error);
+                        return;
+                    }
+                    
+                    // Create detailed modal view
+                    const modalContent = `
+                    <div style="max-width: 500px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); font-family: Inter, sans-serif;">
+                        <div style="text-align: center; margin-bottom: 1.5rem;">
+                            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                <i class="fas fa-info-circle" style="color: #1A1A40; font-size: 24px;"></i>
+                            </div>
+                            <h2 style="color: #1A1A40; margin: 0; font-size: 1.5rem; font-weight: 700;">Detection Details</h2>
+                        </div>
+                        
+                        <div style="space-y: 1rem;">
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+                                <span style="font-weight: 600; color: #374151;">Request ID:</span>
+                                <span style="color: #6B7280; font-family: monospace;">${data.request_id}</span>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+                                <span style="font-weight: 600; color: #374151;">Timestamp:</span>
+                                <span style="color: #6B7280;">${new Date(data.timestamp).toLocaleString()}</span>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+                                <span style="font-weight: 600; color: #374151;">Analysis Type:</span>
+                                <span style="color: #6B7280; text-transform: capitalize;">${data.analysis_type.replace('_', ' ')}</span>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+                                <span style="font-weight: 600; color: #374151;">Result:</span>
+                                <span style="color: ${data.result === 'verified' || data.result === 'authentic' ? '#10B981' : data.result === 'suspicious' ? '#F59E0B' : '#EF4444'}; font-weight: 600; text-transform: capitalize;">${data.result}</span>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+                                <span style="font-weight: 600; color: #374151;">Confidence:</span>
+                                <span style="color: #6B7280; font-weight: 600;">${data.confidence}%</span>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+                                <span style="font-weight: 600; color: #374151;">User:</span>
+                                <span style="color: #6B7280;">${data.user || 'Anonymous'}</span>
+                            </div>
+                            
+                            <div style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+                                <span style="font-weight: 600; color: #374151;">IP Address:</span>
+                                <span style="color: #6B7280; font-family: monospace;">${data.ip_address || 'N/A'}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 2rem; text-align: center;">
+                            <button onclick="closeModal()" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #1A1A40; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                    `;
+                    
+                    // Create and show modal
+                    const modal = document.createElement('div');
+                    modal.id = 'detailsModal';
+                    modal.style.cssText = `
+                        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                        background: rgba(0,0,0,0.5); display: flex; align-items: center; 
+                        justify-content: center; z-index: 1000; backdrop-filter: blur(4px);
+                    `;
+                    modal.innerHTML = modalContent;
+                    document.body.appendChild(modal);
+                    
+                    // Close modal on outside click
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === modal) {
+                            closeModal();
+                        }
+                    });
+                })
+                .catch(error => {
+                    // Restore button state
+                    button.querySelector('i').className = originalIcon;
+                    button.disabled = false;
+                    alert('Error fetching details: ' + error);
+                });
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('detailsModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        function downloadReport(requestId) {
+            // Show Ghost Loader
+            GhostLoader.show('PREPARING DOWNLOAD');
+            
+            // Show loading state on button
+            const button = event.target.closest('button');
+            const originalIcon = button.querySelector('i').className;
+            button.querySelector('i').className = 'fas fa-spinner fa-spin';
+            button.disabled = true;
+            
+            // Create a temporary notification
+            showNotification('Preparing download...', 'info');
+            
+            // Download individual report
+            const downloadUrl = `/api/download-report/${requestId}/`;
+            
+            // Create temporary link for download
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.target = '_blank';
+            link.download = `detection_report_${requestId}.pdf`;
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success notification and hide loader
+            setTimeout(() => {
+                // Restore button state
+                button.querySelector('i').className = originalIcon;
+                button.disabled = false;
+                showNotification('Report downloaded successfully!', 'success');
+                GhostLoader.hide();
+            }, 1000);
+        }
+        
+        function shareReport(requestId) {
+            // Show loading state
+            const button = event.target.closest('button');
+            const originalIcon = button.querySelector('i').className;
+            button.querySelector('i').className = 'fas fa-spinner fa-spin';
+            button.disabled = true;
+            
+            // Create shareable link
+            const shareUrl = `${window.location.origin}/api/detection/${requestId}/`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'GHOST Detection Report',
+                    text: 'Check out this security detection report from GHOST',
+                    url: shareUrl
+                }).then(() => {
+                    // Restore button state
+                    button.querySelector('i').className = originalIcon;
+                    button.disabled = false;
+                    showNotification('Report shared successfully!', 'success');
+                }).catch((error) => {
+                    // Restore button state and fallback to clipboard
+                    button.querySelector('i').className = originalIcon;
+                    button.disabled = false;
+                    copyToClipboard(shareUrl);
+                });
+            } else {
+                // Fallback: copy to clipboard
+                copyToClipboard(shareUrl);
+                // Restore button state
+                button.querySelector('i').className = originalIcon;
+                button.disabled = false;
+            }
+        }
+        
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification('Report link copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(text);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text);
+            }
+        }
+        
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showNotification('Report link copied to clipboard!', 'success');
+            } catch (err) {
+                showNotification('Failed to copy link. Please try again.', 'error');
+            }
+            
+            document.body.removeChild(textArea);
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existing = document.querySelectorAll('.ghost-notification');
+            existing.forEach(n => n.remove());
+            
+            const notification = document.createElement('div');
+            notification.className = 'ghost-notification';
+            
+            const bgColor = type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#3B82F6';
+            const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+            
+            notification.style.cssText = `
+                position: fixed; top: 20px; right: 20px; background: ${bgColor}; 
+                color: white; padding: 1rem 1.5rem; border-radius: 8px; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1001; 
+                display: flex; align-items: center; gap: 0.5rem; font-weight: 500;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        function exportCSV() {
+            showNotification('Preparing CSV export...', 'info');
+            window.open('{% url "export_history_excel" %}', '_blank');
+            setTimeout(() => showNotification('CSV export started!', 'success'), 1000);
+        }
+        
+        function exportExcel() {
+            showNotification('Preparing Excel export...', 'info');
+            window.open('{% url "export_history_excel" %}', '_blank');
+            setTimeout(() => showNotification('Excel export started!', 'success'), 1000);
+        }
+        
+        function exportPDF() {
+            showNotification('Preparing PDF export...', 'info');
+            window.open('{% url "export_history_pdf" %}', '_blank');
+            setTimeout(() => showNotification('PDF export started!', 'success'), 1000);
+        }
+        
+        // Auto-submit form on filter change
+        document.querySelectorAll('select[name="analysis_type"], input[name="date_from"], input[name="date_to"]').forEach(element => {
+            element.addEventListener('change', function() {
+                showNotification('Applying filters...', 'info');
+                this.form.submit();
+            });
+        });
+        
+        // Enhanced search functionality
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            let searchTimeout;
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if (this.value.length >= 3 || this.value.length === 0) {
+                        showNotification('Searching...', 'info');
+                        this.form.submit();
+                    }
+                }, 500);
+            });
+        }
+        
+        // Real-time updates with better UX
+        function checkForUpdates() {
+            // Check for updates every 30 seconds when page is visible
+            setTimeout(() => {
+                if (!document.hidden) {
+                    // You can implement WebSocket or polling here
+                    // For now, just log the check
+                    console.log('Checking for updates...');
+                }
+                checkForUpdates();
+            }, 30000);
+        }
+        
+        // Start checking for updates
+        checkForUpdates();
+        
+        // Demo detection functions that can be triggered from demo pages
+        window.logDetection = function(analysisType, result, confidence, metadata = {}) {
+            const data = {
+                analysis_type: analysisType,
+                result: result,
+                confidence: confidence,
+                metadata: metadata
+            };
+            
+            fetch('/api/log-detection/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Detection logged:', data.request_id);
+                    showNotification('Detection logged successfully!', 'success');
+                } else {
+                    console.error('Failed to log detection:', data.error);
+                    showNotification('Failed to log detection', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error logging detection:', error);
+                showNotification('Error logging detection', 'error');
+            });
+        };
+        
+        // Add CSS animations for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            .action-btn:hover {
+                transform: scale(1.1);
+                transition: all 0.2s ease;
+            }
+            
+            .action-btn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="{% url 'index' %}" class="text-2xl font-bold text-deep-navy">
+                            <span class="text-premium-gold">GHOST</span> History
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="{% url 'index' %}" class="text-charcoal hover:text-premium-gold px-3 py-2 rounded-md text-sm font-medium transition-all duration-300">Home</a>
+                            <a href="{% url 'deepfake_demo' %}" class="text-charcoal hover:text-premium-gold px-3 py-2 rounded-md text-sm font-medium transition-all duration-300">Deepfake Scan</a>
+                            <a href="{% url 'voice_demo' %}" class="text-charcoal hover:text-premium-gold px-3 py-2 rounded-md text-sm font-medium transition-all duration-300">Voice Analysis</a>
+                            <a href="{% url 'fraud_demo' %}" class="text-charcoal hover:text-premium-gold px-3 py-2 rounded-md text-sm font-medium transition-all duration-300">Fraud Detection</a>
+                            <a href="{% url 'history' %}" class="text-premium-gold font-semibold px-3 py-2 rounded-md text-sm transition-all duration-300">History</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6 space-x-4">
+                        <a href="{% url 'login' %}" class="bg-premium-gold hover:bg-yellow-500 text-deep-navy px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-user mr-2"></i>Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto animate-slide-up">
+        <div class="text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-premium-gold rounded-full mb-6 animate-zoom-in">
+                <i class="fas fa-history text-deep-navy text-2xl"></i>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-deep-navy mb-4">
+                Security <span class="text-premium-gold">History</span>
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Track all your security scans, verifications, and system activities in one comprehensive dashboard
+            </p>
+        </div>
+    </section>
+
+    <!-- Filters and Search -->
+    <section class="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-8 animate-slide-up" style="animation-delay: 0.2s;">
+        <div class="premium-card rounded-xl p-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <!-- Time Filters -->
+                <div class="flex flex-wrap gap-3">
+                    <button class="filter-btn filter-active px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300" data-filter="all">
+                        <i class="fas fa-globe mr-2"></i>All Time
+                    </button>
+                    <button class="filter-btn bg-gray-100 hover:bg-premium-gold hover:text-deep-navy px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300" data-filter="today">
+                        <i class="fas fa-calendar-day mr-2"></i>Today
+                    </button>
+                    <button class="filter-btn bg-gray-100 hover:bg-premium-gold hover:text-deep-navy px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300" data-filter="week">
+                        <i class="fas fa-calendar-week mr-2"></i>This Week
+                    </button>
+                    <button class="filter-btn bg-gray-100 hover:bg-premium-gold hover:text-deep-navy px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300" data-filter="month">
+                        <i class="fas fa-calendar-alt mr-2"></i>Last Month
+                    </button>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input type="text" id="searchInput" class="search-glow block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-premium-gold focus:border-transparent transition-all duration-300" placeholder="Search history logs...">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Cards -->
+    <section class="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-8 animate-slide-up" style="animation-delay: 0.3s;">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="premium-card rounded-xl p-6 text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-check text-green-600 text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-deep-navy mb-1">47</h3>
+                <p class="text-gray-600 text-sm">Total Scans</p>
+            </div>
+            <div class="premium-card rounded-xl p-6 text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-eye text-blue-600 text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-deep-navy mb-1">23</h3>
+                <p class="text-gray-600 text-sm">Deepfake Checks</p>
+            </div>
+            <div class="premium-card rounded-xl p-6 text-center">
+                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-microphone text-purple-600 text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-deep-navy mb-1">18</h3>
+                <p class="text-gray-600 text-sm">Voice Analyses</p>
+            </div>
+            <div class="premium-card rounded-xl p-6 text-center">
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-deep-navy mb-1">6</h3>
+                <p class="text-gray-600 text-sm">Threats Detected</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Timeline -->
+    <section class="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-12 animate-slide-up" style="animation-delay: 0.4s;">
+        <div class="premium-card rounded-xl p-8">
+            <h2 class="text-2xl font-bold text-deep-navy mb-8 flex items-center">
+                <i class="fas fa-clock text-premium-gold mr-3"></i>
+                Activity Timeline
+            </h2>
+            
+            <div class="space-y-8" id="historyTimeline">
+                <!-- Today -->
+                <div class="timeline-section">
+                    <div class="flex items-center mb-6">
+                        <div class="timeline-line w-1 h-8 rounded mr-4"></div>
+                        <h3 class="text-lg font-semibold text-deep-navy">Today - July 27, 2025</h3>
+                    </div>
+                    
+                    <div class="ml-5 space-y-4">
+                        <!-- History Item 1 -->
+                        <div class="history-item premium-card rounded-lg p-6 ml-4 border-l-4 border-premium-gold">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-video text-blue-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-semibold text-deep-navy mb-2">Deepfake Detection Scan</h4>
+                                        <p class="text-gray-600 mb-3">Analyzed video file "conference_call.mp4" for synthetic content</p>
+                                        <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                            <span><i class="fas fa-clock mr-1"></i>2:34 PM</span>
+                                            <span><i class="fas fa-file-video mr-1"></i>25.4 MB</span>
+                                            <span><i class="fas fa-stopwatch mr-1"></i>12s scan time</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="status-success text-white px-3 py-1 rounded-full text-sm font-medium">
+                                        <i class="fas fa-check mr-1"></i>Clean
+                                    </span>
+                                    <button class="text-premium-gold hover:text-yellow-600 transition-colors" title="Download Report">
+                                        <i class="fas fa-download text-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- History Item 2 -->
+                        <div class="history-item premium-card rounded-lg p-6 ml-4 border-l-4 border-red-500">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-microphone text-red-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-semibold text-deep-navy mb-2">Voice Clone Detection</h4>
+                                        <p class="text-gray-600 mb-3">Suspicious voice patterns detected in audio sample</p>
+                                        <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                            <span><i class="fas fa-clock mr-1"></i>11:22 AM</span>
+                                            <span><i class="fas fa-file-audio mr-1"></i>3.2 MB</span>
+                                            <span><i class="fas fa-stopwatch mr-1"></i>8s scan time</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="status-danger text-white px-3 py-1 rounded-full text-sm font-medium">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>Threat
+                                    </span>
+                                    <button class="text-premium-gold hover:text-yellow-600 transition-colors" title="Download Report">
+                                        <i class="fas fa-download text-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Yesterday -->
+                <div class="timeline-section">
+                    <div class="flex items-center mb-6">
+                        <div class="timeline-line w-1 h-8 rounded mr-4"></div>
+                        <h3 class="text-lg font-semibold text-deep-navy">Yesterday - July 26, 2025</h3>
+                    </div>
+                    
+                    <div class="ml-5 space-y-4">
+                        <!-- History Item 3 -->
+                        <div class="history-item premium-card rounded-lg p-6 ml-4 border-l-4 border-yellow-500">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-shield-alt text-yellow-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-semibold text-deep-navy mb-2">Fraud Risk Assessment</h4>
+                                        <p class="text-gray-600 mb-3">Comprehensive security analysis completed with medium risk factors</p>
+                                        <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                            <span><i class="fas fa-clock mr-1"></i>4:15 PM</span>
+                                            <span><i class="fas fa-chart-line mr-1"></i>Risk Score: 6.2/10</span>
+                                            <span><i class="fas fa-stopwatch mr-1"></i>45s analysis</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="status-warning text-white px-3 py-1 rounded-full text-sm font-medium">
+                                        <i class="fas fa-exclamation mr-1"></i>Medium Risk
+                                    </span>
+                                    <button class="text-premium-gold hover:text-yellow-600 transition-colors" title="Download Report">
+                                        <i class="fas fa-download text-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- History Item 4 -->
+                        <div class="history-item premium-card rounded-lg p-6 ml-4 border-l-4 border-premium-gold">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-start space-x-4">
+                                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-key text-green-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="text-lg font-semibold text-deep-navy mb-2">Voice OTP Verification</h4>
+                                        <p class="text-gray-600 mb-3">Successfully verified user identity through voice biometrics</p>
+                                        <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                            <span><i class="fas fa-clock mr-1"></i>9:33 AM</span>
+                                            <span><i class="fas fa-user-check mr-1"></i>Identity Confirmed</span>
+                                            <span><i class="fas fa-stopwatch mr-1"></i>3s verification</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="status-success text-white px-3 py-1 rounded-full text-sm font-medium">
+                                        <i class="fas fa-check mr-1"></i>Verified
+                                    </span>
+                                    <button class="text-premium-gold hover:text-yellow-600 transition-colors" title="Download Report">
+                                        <i class="fas fa-download text-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="text-center mt-8">
+                <button class="bg-premium-gold hover:bg-yellow-500 text-deep-navy px-8 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105">
+                    <i class="fas fa-arrow-down mr-2"></i>Load More History
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto mb-12 animate-slide-up" style="animation-delay: 0.5s;">
+        <div class="premium-card rounded-xl p-8">
+            <h2 class="text-2xl font-bold text-deep-navy mb-6 text-center">Quick Actions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <a href="{% url 'deepfake_demo' %}" class="premium-card rounded-lg p-6 text-center hover:scale-105 transition-all duration-300 group">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
+                        <i class="fas fa-video text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-deep-navy mb-2">New Deepfake Scan</h3>
+                    <p class="text-gray-600 text-sm">Upload and analyze video content</p>
+                </a>
+                
+                <a href="{% url 'voice_demo' %}" class="premium-card rounded-lg p-6 text-center hover:scale-105 transition-all duration-300 group">
+                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
+                        <i class="fas fa-microphone text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-deep-navy mb-2">Voice Analysis</h3>
+                    <p class="text-gray-600 text-sm">Verify voice authenticity</p>
+                </a>
+                
+                <a href="{% url 'fraud_demo' %}" class="premium-card rounded-lg p-6 text-center hover:scale-105 transition-all duration-300 group">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-red-200 transition-colors">
+                        <i class="fas fa-shield-alt text-red-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-deep-navy mb-2">Fraud Assessment</h3>
+                    <p class="text-gray-600 text-sm">Comprehensive risk analysis</p>
+                </a>
+                
+                <a href="{% url 'otp_demo' %}" class="premium-card rounded-lg p-6 text-center hover:scale-105 transition-all duration-300 group">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-200 transition-colors">
+                        <i class="fas fa-key text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-deep-navy mb-2">Voice OTP</h3>
+                    <p class="text-gray-600 text-sm">Secure voice verification</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Assistant (Optional) -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <button id="aiAssistant" class="w-16 h-16 bg-premium-gold hover:bg-yellow-500 text-deep-navy rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 flex items-center justify-center">
+            <i class="fas fa-robot text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-deep-navy text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">
+                        <span class="text-premium-gold">GHOST</span> Security
+                    </h3>
+                    <p class="text-gray-300 text-sm">
+                        Advanced AI-driven identity verification protecting against deepfakes and synthetic media.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'index' %}" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Home</a></li>
+                        <li><a href="{% url 'history' %}" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">History</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Reports</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Settings</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Security Tools</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'deepfake_demo' %}" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Deepfake Detection</a></li>
+                        <li><a href="{% url 'voice_demo' %}" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Voice Analysis</a></li>
+                        <li><a href="{% url 'fraud_demo' %}" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Fraud Assessment</a></li>
+                        <li><a href="{% url 'otp_demo' %}" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Voice OTP</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">API Docs</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-premium-gold text-sm transition-colors">Status</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-700 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">
+                    © 2025 GHOST Security. All rights reserved.
+                </p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-premium-gold transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-premium-gold transition-colors">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-premium-gold transition-colors">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from all buttons
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('filter-active');
+                    b.classList.add('bg-gray-100', 'hover:bg-premium-gold', 'hover:text-deep-navy');
+                });
+                
+                // Add active class to clicked button
+                this.classList.add('filter-active');
+                this.classList.remove('bg-gray-100', 'hover:bg-premium-gold', 'hover:text-deep-navy');
+                
+                // Filter logic would go here
+                const filter = this.dataset.filter;
+                console.log('Filtering by:', filter);
+            });
+        });
+        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const historyItems = document.querySelectorAll('.history-item');
+            
+            historyItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        
+        // AI Assistant with enhanced functionality
+        document.getElementById('aiAssistant').addEventListener('click', function() {
+            const assistantContent = `
+            <div style="max-width: 400px; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); font-family: Inter, sans-serif;">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="fas fa-robot" style="color: #1A1A40; font-size: 24px;"></i>
+                    </div>
+                    <h2 style="color: #1A1A40; margin: 0; font-size: 1.5rem; font-weight: 700;">GHOST AI Assistant</h2>
+                </div>
+                
+                <div style="color: #6B7280; line-height: 1.6; margin-bottom: 1.5rem;">
+                    <p style="margin-bottom: 1rem;">Hello! I'm your AI security assistant. I can help you with:</p>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 0.5rem 0; display: flex; align-items: center;">
+                            <i class="fas fa-chart-line" style="color: #FFD700; margin-right: 0.75rem; width: 16px;"></i>
+                            Analyze your security trends
+                        </li>
+                        <li style="padding: 0.5rem 0; display: flex; align-items: center;">
+                            <i class="fas fa-search" style="color: #FFD700; margin-right: 0.75rem; width: 16px;"></i>
+                            Find specific detection reports
+                        </li>
+                        <li style="padding: 0.5rem 0; display: flex; align-items: center;">
+                            <i class="fas fa-lightbulb" style="color: #FFD700; margin-right: 0.75rem; width: 16px;"></i>
+                            Provide security recommendations
+                        </li>
+                        <li style="padding: 0.5rem 0; display: flex; align-items: center;">
+                            <i class="fas fa-download" style="color: #FFD700; margin-right: 0.75rem; width: 16px;"></i>
+                            Export custom reports
+                        </li>
+                    </ul>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                    <button onclick="askAI('trends')" style="background: #F3F4F6; border: 1px solid #E5E7EB; color: #374151; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;">
+                        📊 Show Trends
+                    </button>
+                    <button onclick="askAI('summary')" style="background: #F3F4F6; border: 1px solid #E5E7EB; color: #374151; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;">
+                        📋 Daily Summary
+                    </button>
+                    <button onclick="askAI('recommendations')" style="background: #F3F4F6; border: 1px solid #E5E7EB; color: #374151; padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;">
+                        💡 Get Tips
+                    </button>
+                </div>
+                
+                <div style="display: flex; gap: 0.75rem;">
+                    <button onclick="closeAIModal()" style="background: #6B7280; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; flex: 1;">
+                        Close
+                    </button>
+                    <button onclick="askAI('chat')" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #1A1A40; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; flex: 1;">
+                        Chat Now
+                    </button>
+                </div>
+            </div>
+            `;
+            
+            // Create and show AI modal
+            const modal = document.createElement('div');
+            modal.id = 'aiModal';
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.5); display: flex; align-items: center; 
+                justify-content: center; z-index: 1000; backdrop-filter: blur(4px);
+            `;
+            modal.innerHTML = assistantContent;
+            document.body.appendChild(modal);
+            
+            // Close modal on outside click
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeAIModal();
+                }
+            });
+        });
+        
+        function askAI(type) {
+            closeAIModal();
+            switch(type) {
+                case 'trends':
+                    showNotification('Analyzing your security trends...', 'info');
+                    setTimeout(() => {
+                        showNotification('Trend analysis: 15% increase in deepfake attempts this week. Stay vigilant!', 'success');
+                    }, 2000);
+                    break;
+                case 'summary':
+                    showNotification('Generating daily summary...', 'info');
+                    setTimeout(() => {
+                        showNotification('Today: 5 scans completed, 1 threat detected, 100% accuracy rate.', 'success');
+                    }, 2000);
+                    break;
+                case 'recommendations':
+                    showNotification('Analyzing security recommendations...', 'info');
+                    setTimeout(() => {
+                        showNotification('Tip: Enable real-time monitoring for better threat detection.', 'success');
+                    }, 2000);
+                    break;
+                case 'chat':
+                    showNotification('Opening AI chat interface...', 'info');
+                    setTimeout(() => {
+                        showNotification('Chat feature coming soon in premium version!', 'info');
+                    }, 1500);
+                    break;
+            }
+        }
+        
+        function closeAIModal() {
+            const modal = document.getElementById('aiModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // Enhanced tooltip functionality
+        document.querySelectorAll('[title]').forEach(element => {
+            let tooltip;
+            
+            element.addEventListener('mouseenter', function() {
+                tooltip = document.createElement('div');
+                tooltip.className = 'ghost-tooltip';
+                tooltip.style.cssText = `
+                    position: absolute; background: #1A1A40; color: white; 
+                    padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.75rem; 
+                    z-index: 1000; white-space: nowrap; pointer-events: none;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                `;
+                tooltip.textContent = this.getAttribute('title');
+                
+                // Position tooltip
+                const rect = this.getBoundingClientRect();
+                tooltip.style.top = (rect.top - 40) + 'px';
+                tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+                tooltip.style.transform = 'translateX(-50%)';
+                
+                document.body.appendChild(tooltip);
+                
+                // Remove title to prevent default tooltip
+                this.setAttribute('data-title', this.getAttribute('title'));
+                this.removeAttribute('title');
+            });
+            
+            element.addEventListener('mouseleave', function() {
+                if (tooltip) {
+                    tooltip.remove();
+                    tooltip = null;
+                }
+                
+                // Restore title
+                if (this.getAttribute('data-title')) {
+                    this.setAttribute('title', this.getAttribute('data-title'));
+                    this.removeAttribute('data-title');
+                }
+            });
+        });
+        
+        // Smooth animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.history-item').forEach(item => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(item);
+        });
+
+        // Timestamp refresh function for live relative time updates
+        function refreshRelativeTimestamps() {
+            if (!historyData || historyData.length === 0) return;
+            
+            const timestampElements = document.querySelectorAll('[data-timestamp]');
+            timestampElements.forEach(element => {
+                const timestamp = element.getAttribute('data-timestamp');
+                if (!timestamp) return;
+                
+                const dateObj = new Date(timestamp);
+                const now = new Date();
+                const timeDiff = now - dateObj;
+                
+                let relativeTime = '';
+                if (timeDiff < 60000) { // Less than 1 minute
+                    relativeTime = 'Just now';
+                } else if (timeDiff < 3600000) { // Less than 1 hour
+                    const minutes = Math.floor(timeDiff / 60000);
+                    relativeTime = `${minutes} min ago`;
+                } else if (timeDiff < 86400000) { // Less than 24 hours
+                    const hours = Math.floor(timeDiff / 3600000);
+                    relativeTime = `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                } else if (timeDiff < 604800000) { // Less than 7 days
+                    const days = Math.floor(timeDiff / 86400000);
+                    relativeTime = `${days} day${days > 1 ? 's' : ''} ago`;
+                } else {
+                    relativeTime = dateObj.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                    });
+                }
+                
+                element.textContent = relativeTime;
+            });
+        }
+        
+        // Start timestamp refresh interval
+        setInterval(refreshRelativeTimestamps, 60000); // Update every minute
+
+        // Add navigation loading for page transitions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers to navigation links
+            const navLinks = document.querySelectorAll('a[href*="demo"], a[href*="index"], a[href*="login"]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Only show loader for internal navigation (not downloads or external links)
+                    if (!this.hasAttribute('download') && !this.href.includes('#') && !this.target) {
+                        GhostLoader.show('NAVIGATING');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

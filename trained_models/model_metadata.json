@@ -1,0 +1,25 @@
+{
+  "best_model": "xgboost",
+  "models": {
+    "xgboost": {
+      "accuracy": 0.9995,
+      "auc_score": 1.0,
+      "training_time": 1.651125
+    },
+    "random_forest": {
+      "accuracy": 1.0,
+      "auc_score": 1.0,
+      "training_time": 4.010202
+    },
+    "svm": {
+      "accuracy": 1.0,
+      "auc_score": 1.0,
+      "training_time": 3.425444
+    }
+  },
+  "feature_extractor_type": "Enhanced_Real_Dataset_Acoustic",
+  "training_date": "2025-08-01 00:53:14",
+  "num_features": 154,
+  "dataset_source": "Enhanced_Synthetic_Real_Patterns",
+  "sample_rate": 22050
+}

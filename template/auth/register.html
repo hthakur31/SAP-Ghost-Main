@@ -1,0 +1,511 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - GHOST Security</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --premium-gold: #D4AF37;
+            --midnight-blue: #1A1A40;
+            --jet-black: #000000;
+            --soft-white: #FAFAFA;
+            --border-gray: #E5E7EB;
+            --text-gray: #6B7280;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--soft-white) 0%, #F3F4F6 100%);
+            min-height: 100vh;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-gray);
+        }
+
+        .premium-input {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid var(--border-gray);
+            border-radius: 12px;
+            padding: 14px 16px 14px 48px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .premium-input:focus {
+            border-color: var(--premium-gold);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .input-icon {
+            color: var(--text-gray);
+            transition: color 0.3s ease;
+        }
+
+        .premium-input:focus + .input-icon {
+            color: var(--premium-gold);
+        }
+
+        .premium-btn {
+            background: linear-gradient(135deg, var(--premium-gold) 0%, #E6C547 100%);
+            color: var(--midnight-blue);
+            font-weight: 600;
+            padding: 14px 32px;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .premium-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+            background: linear-gradient(135deg, #E6C547 0%, var(--premium-gold) 100%);
+        }
+
+        .premium-btn:active {
+            transform: translateY(0);
+        }
+
+        .secondary-btn {
+            color: var(--midnight-blue);
+            border: 2px solid var(--border-gray);
+            background: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .secondary-btn:hover {
+            border-color: var(--premium-gold);
+            background: rgba(212, 175, 55, 0.05);
+            transform: translateY(-1px);
+        }
+
+        .notification {
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            border-left: 4px solid;
+            animation: slideInDown 0.5s ease-out;
+        }
+
+        .notification.success {
+            background: #F0FDF4;
+            color: #166534;
+            border-left-color: #16A34A;
+        }
+
+        .notification.error {
+            background: #FEF2F2;
+            color: #DC2626;
+            border-left-color: #EF4444;
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--midnight-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .feature-badge {
+            background: linear-gradient(135deg, var(--premium-gold) 0%, #E6C547 100%);
+            color: var(--midnight-blue);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .password-strength {
+            height: 4px;
+            border-radius: 2px;
+            background: #E5E7EB;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            width: 0%;
+        }
+
+        .strength-weak { background: #EF4444; width: 25%; }
+        .strength-fair { background: #F59E0B; width: 50%; }
+        .strength-good { background: #10B981; width: 75%; }
+        .strength-strong { background: #059669; width: 100%; }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Premium Header -->
+    {% include 'partials/header.html' %}
+
+    <div class="min-h-screen flex items-center justify-center px-4 py-20">
+        <div class="max-w-lg w-full">
+            <!-- Welcome Section -->
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full mb-6 shadow-lg">
+                    <i class="fas fa-user-plus text-white text-2xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Join GHOST Security</h1>
+                <p class="text-gray-600">Create your premium security account</p>
+                <div class="mt-4">
+                    <span class="feature-badge">ENTERPRISE GRADE</span>
+                </div>
+            </div>
+
+            <!-- Auth Container -->
+            <div class="auth-container p-8">
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="notification {{ message.tags }}">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-triangle{% endif %} mr-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Registration Form -->
+                <form method="POST" id="registerForm" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Name Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="relative">
+                            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                First Name
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="first_name" 
+                                    name="first_name" 
+                                    class="premium-input w-full"
+                                    placeholder="First name"
+                                    required
+                                    autocomplete="given-name"
+                                >
+                                <i class="fas fa-user input-icon absolute left-4 top-1/2 transform -translate-y-1/2"></i>
+                            </div>
+                        </div>
+
+                        <div class="relative">
+                            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Last Name
+                            </label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    id="last_name" 
+                                    name="last_name" 
+                                    class="premium-input w-full"
+                                    placeholder="Last name"
+                                    autocomplete="family-name"
+                                >
+                                <i class="fas fa-user input-icon absolute left-4 top-1/2 transform -translate-y-1/2"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Username Field -->
+                    <div class="relative">
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                            Username
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="username" 
+                                name="username" 
+                                class="premium-input w-full"
+                                placeholder="Choose a unique username"
+                                required
+                                autocomplete="username"
+                            >
+                            <i class="fas fa-at input-icon absolute left-4 top-1/2 transform -translate-y-1/2"></i>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">At least 3 characters, letters, numbers, and underscores only</p>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div class="relative">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="premium-input w-full"
+                                placeholder="Enter your email address"
+                                required
+                                autocomplete="email"
+                            >
+                            <i class="fas fa-envelope input-icon absolute left-4 top-1/2 transform -translate-y-1/2"></i>
+                        </div>
+                    </div>
+
+                    <!-- Company Field (Optional) -->
+                    <div class="relative">
+                        <label for="company" class="block text-sm font-medium text-gray-700 mb-2">
+                            Company <span class="text-gray-400 text-sm">(Optional)</span>
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="company" 
+                                name="company" 
+                                class="premium-input w-full"
+                                placeholder="Your company or organization"
+                                autocomplete="organization"
+                            >
+                            <i class="fas fa-building input-icon absolute left-4 top-1/2 transform -translate-y-1/2"></i>
+                        </div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="relative">
+                        <label for="password1" class="block text-sm font-medium text-gray-700 mb-2">
+                            Password
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password1" 
+                                name="password1" 
+                                class="premium-input w-full"
+                                placeholder="Create a strong password"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <i class="fas fa-lock input-icon absolute left-4 top-1/2 transform -translate-y-1/2"></i>
+                            <button 
+                                type="button" 
+                                id="togglePassword1"
+                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="password-strength-bar" id="strengthBar"></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">At least 8 characters with uppercase, lowercase, and numbers</p>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="relative">
+                        <label for="password2" class="block text-sm font-medium text-gray-700 mb-2">
+                            Confirm Password
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password2" 
+                                name="password2" 
+                                class="premium-input w-full"
+                                placeholder="Confirm your password"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <i class="fas fa-lock input-icon absolute left-4 top-1/2 transform -translate-y-1/2"></i>
+                            <button 
+                                type="button" 
+                                id="togglePassword2"
+                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div id="passwordMatch" class="text-xs mt-1 hidden">
+                            <i class="fas fa-check text-green-500 mr-1"></i>
+                            <span class="text-green-600">Passwords match</span>
+                        </div>
+                    </div>
+
+                    <!-- Terms Agreement -->
+                    <div class="flex items-start">
+                        <input 
+                            type="checkbox" 
+                            id="terms" 
+                            name="terms" 
+                            class="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded mt-1"
+                            required
+                        >
+                        <label for="terms" class="ml-3 text-sm text-gray-600">
+                            I agree to the <a href="#" class="text-yellow-600 hover:text-yellow-500 font-medium">Terms of Service</a> 
+                            and <a href="#" class="text-yellow-600 hover:text-yellow-500 font-medium">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="premium-btn w-full flex items-center justify-center">
+                        <span id="registerText">Create Account</span>
+                        <div class="loader ml-2"></div>
+                    </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="mt-8 mb-6">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-white text-gray-500">Already have an account?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                    <a href="{% url 'login' %}" class="secondary-btn inline-flex items-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Sign In
+                    </a>
+                </div>
+            </div>
+
+            <!-- Back to Home -->
+            <div class="text-center mt-6">
+                <a href="{% url 'index' %}" class="text-gray-500 hover:text-gray-700 text-sm font-medium">
+                    <i class="fas fa-arrow-left mr-1"></i>
+                    Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Toggle password visibility
+        function setupPasswordToggle(inputId, buttonId) {
+            document.getElementById(buttonId).addEventListener('click', function() {
+                const passwordField = document.getElementById(inputId);
+                const icon = this.querySelector('i');
+                
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordField.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+
+        setupPasswordToggle('password1', 'togglePassword1');
+        setupPasswordToggle('password2', 'togglePassword2');
+
+        // Password strength checker
+        document.getElementById('password1').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('strengthBar');
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 1;
+            if (/[a-z]/.test(password)) strength += 1;
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+            
+            strengthBar.className = 'password-strength-bar';
+            if (strength >= 2) strengthBar.classList.add('strength-weak');
+            if (strength >= 3) {
+                strengthBar.classList.remove('strength-weak');
+                strengthBar.classList.add('strength-fair');
+            }
+            if (strength >= 4) {
+                strengthBar.classList.remove('strength-fair');
+                strengthBar.classList.add('strength-good');
+            }
+            if (strength === 5) {
+                strengthBar.classList.remove('strength-good');
+                strengthBar.classList.add('strength-strong');
+            }
+        });
+
+        // Password match checker
+        document.getElementById('password2').addEventListener('input', function() {
+            const password1 = document.getElementById('password1').value;
+            const password2 = this.value;
+            const matchIndicator = document.getElementById('passwordMatch');
+            
+            if (password2 && password1 === password2) {
+                matchIndicator.classList.remove('hidden');
+            } else {
+                matchIndicator.classList.add('hidden');
+            }
+        });
+
+        // Form submission with loading state
+        document.getElementById('registerForm').addEventListener('submit', function() {
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const loader = submitBtn.querySelector('.loader');
+            const text = submitBtn.querySelector('#registerText');
+            
+            submitBtn.disabled = true;
+            loader.style.display = 'block';
+            text.textContent = 'Creating Account...';
+            
+            // Re-enable after 5 seconds in case of slow response
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                loader.style.display = 'none';
+                text.textContent = 'Create Account';
+            }, 5000);
+        });
+
+        // Input focus animations
+        document.querySelectorAll('.premium-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+
+        // Auto-hide notifications after 5 seconds
+        document.querySelectorAll('.notification').forEach(notification => {
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-20px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

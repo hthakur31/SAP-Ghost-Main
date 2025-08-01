@@ -1,0 +1,321 @@
+{% load static %}
+
+<!-- Premium Sticky Header -->
+<header id="ghostHeader" class="fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-lg border-b border-gray-100 shadow-lg transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center h-20">
+            
+            <!-- Premium Logo Section -->
+            <div class="flex items-center space-x-3 flex-shrink-0">
+                <div class="flex items-center">
+                    <!-- Premium Logo with Animation -->
+                    <div class="relative group">
+                        <div class="w-12 h-12 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-110">
+                            <i class="fas fa-ghost text-slate-800 text-2xl transform group-hover:rotate-12 transition-transform duration-300"></i>
+                        </div>
+                        <!-- Glow effect -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300"></div>
+                    </div>
+                    
+                    <!-- Brand Text -->
+                    <div class="ml-3">
+                        <h1 class="text-2xl font-bold tracking-tight">
+                            <span class="bg-gradient-to-r from-amber-500 via-yellow-600 to-amber-700 bg-clip-text text-transparent">GHOST</span>
+                        </h1>
+                        <p class="text-xs text-slate-600 font-medium tracking-wide">AI Security Platform</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation - Centered -->
+            <nav class="hidden lg:flex items-center justify-center flex-1 mx-8">
+                <div class="flex items-center space-x-6">
+                    <a href="{% url 'index' %}" class="nav-link group flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-amber-50">
+                        <i class="fas fa-home text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                        <span class="font-medium text-slate-700 group-hover:text-amber-700">Home</span>
+                    </a>
+                    
+                    <a href="#about" class="nav-link group flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-amber-50">
+                        <i class="fas fa-ghost text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                        <span class="font-medium text-slate-700 group-hover:text-amber-700">About GHOST</span>
+                    </a>
+                    
+                    <a href="{% url 'index' %}#features" class="nav-link group flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-amber-50">
+                        <i class="fas fa-brain text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                        <span class="font-medium text-slate-700 group-hover:text-amber-700">Features</span>
+                    </a>
+                    
+                    <a href="{% url 'history' %}" class="nav-link group flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-amber-50">
+                        <i class="fas fa-history text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                        <span class="font-medium text-slate-700 group-hover:text-amber-700">History</span>
+                    </a>
+                    
+                    <a href="{% url 'business_model' %}" class="nav-link group flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-amber-50">
+                        <i class="fas fa-chart-line text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                        <span class="font-medium text-slate-700 group-hover:text-amber-700">How It Works</span>
+                    </a>
+                    
+                    <a href="{% url 'pricing' %}" class="nav-link group flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-amber-50">
+                        <i class="fas fa-credit-card text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                        <span class="font-medium text-slate-700 group-hover:text-amber-700">Pricing</span>
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Auth Buttons & Mobile Menu - Right Side -->
+            <div class="flex items-center space-x-4 flex-shrink-0">
+                
+                <!-- Desktop Auth Buttons -->
+                <div class="hidden lg:flex items-center space-x-3">
+                    {% if user.is_authenticated %}
+                        <!-- Authenticated User Menu -->
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 px-4 py-2.5 text-slate-700 hover:text-slate-900 border border-slate-200 rounded-lg hover:border-slate-300 transition-all duration-300 hover:shadow-md">
+                                <div class="w-8 h-8 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                    {{ user.first_name|first|default:user.username|first|upper }}
+                                </div>
+                                <span class="font-medium">{{ user.first_name|default:user.username }}</span>
+                                <i class="fas fa-chevron-down text-slate-400"></i>
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                <div class="py-2">
+                                    <a href="{% url 'dashboard' %}" class="block px-4 py-2 text-slate-700 hover:bg-slate-50 transition-colors duration-200">
+                                        <i class="fas fa-user mr-2"></i>Profile
+                                    </a>
+                                    <a href="#settings" class="block px-4 py-2 text-slate-700 hover:bg-slate-50 transition-colors duration-200">
+                                        <i class="fas fa-cog mr-2"></i>Settings
+                                    </a>
+                                    <hr class="my-2 border-slate-200">
+                                    <a href="{% url 'logout' %}" class="block px-4 py-2 text-red-600 hover:bg-red-50 transition-colors duration-200">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- Guest User Menu -->
+                        <a href="{% url 'login' %}" class="group flex items-center space-x-2 px-5 py-2.5 text-slate-700 hover:text-slate-900 border border-slate-200 rounded-lg hover:border-slate-300 transition-all duration-300 hover:shadow-md">
+                            <i class="fas fa-sign-in-alt text-slate-500 group-hover:text-slate-700 transition-colors duration-300"></i>
+                            <span class="font-medium">Login</span>
+                        </a>
+                        
+                        <a href="{% url 'register' %}" class="group flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-600 text-white rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all duration-300 hover:shadow-lg hover:scale-105 transform">
+                            <i class="fas fa-user-plus text-white transition-colors duration-300"></i>
+                            <span class="font-semibold">Register</span>
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-300 group">
+                    <div class="space-y-1.5">
+                        <div class="w-6 h-0.5 bg-slate-600 group-hover:bg-amber-600 transition-all duration-300 transform group-hover:rotate-45 group-hover:translate-y-2"></div>
+                        <div class="w-6 h-0.5 bg-slate-600 group-hover:bg-amber-600 transition-all duration-300 group-hover:opacity-0"></div>
+                        <div class="w-6 h-0.5 bg-slate-600 group-hover:bg-amber-600 transition-all duration-300 transform group-hover:-rotate-45 group-hover:-translate-y-2"></div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Menu -->
+    <div id="mobileMenu" class="lg:hidden bg-white border-t border-gray-100 shadow-xl transform translate-y-full opacity-0 invisible transition-all duration-300">
+        <div class="px-4 py-6 space-y-4">
+            
+            <!-- Mobile Navigation Links -->
+            <a href="{% url 'index' %}" class="mobile-nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-amber-50 transition-all duration-300 group">
+                <i class="fas fa-home text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                <span class="font-medium text-slate-700 group-hover:text-amber-700">Home</span>
+            </a>
+            
+            <a href="#about" class="mobile-nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-amber-50 transition-all duration-300 group">
+                <i class="fas fa-ghost text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                <span class="font-medium text-slate-700 group-hover:text-amber-700">About GHOST</span>
+            </a>
+            
+            <a href="{% url 'index' %}#features" class="mobile-nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-amber-50 transition-all duration-300 group">
+                <i class="fas fa-brain text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                <span class="font-medium text-slate-700 group-hover:text-amber-700">Features</span>
+            </a>
+            
+            <a href="{% url 'history' %}" class="mobile-nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-amber-50 transition-all duration-300 group">
+                <i class="fas fa-history text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                <span class="font-medium text-slate-700 group-hover:text-amber-700">History</span>
+            </a>
+            
+            <a href="{% url 'business_model' %}" class="mobile-nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-amber-50 transition-all duration-300 group">
+                <i class="fas fa-chart-line text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                <span class="font-medium text-slate-700 group-hover:text-amber-700">Business Model</span>
+            </a>
+            
+            <a href="{% url 'pricing' %}" class="mobile-nav-link flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-amber-50 transition-all duration-300 group">
+                <i class="fas fa-credit-card text-slate-600 group-hover:text-amber-600 transition-colors duration-300"></i>
+                <span class="font-medium text-slate-700 group-hover:text-amber-700">Pricing</span>
+            </a>
+            
+            <!-- Mobile Auth Buttons -->
+            <div class="pt-4 border-t border-gray-100 space-y-3">
+                {% if user.is_authenticated %}
+                    <div class="flex items-center space-x-3 px-4 py-3 bg-amber-50 rounded-lg">
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-600 rounded-full flex items-center justify-center text-white font-bold">
+                            {{ user.first_name|first|default:user.username|first|upper }}
+                        </div>
+                        <div>
+                            <p class="font-semibold text-slate-900">{{ user.first_name|default:user.username }}</p>
+                            <p class="text-sm text-slate-600">{{ user.email }}</p>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'logout' %}" class="flex items-center justify-center space-x-2 w-full px-4 py-3 text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-all duration-300 group">
+                        <i class="fas fa-sign-out-alt text-red-500"></i>
+                        <span class="font-medium">Logout</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="flex items-center justify-center space-x-2 w-full px-4 py-3 text-slate-700 border border-slate-200 rounded-lg hover:border-slate-300 transition-all duration-300 group">
+                        <i class="fas fa-sign-in-alt text-slate-500 group-hover:text-slate-700 transition-colors duration-300"></i>
+                        <span class="font-medium">Login</span>
+                    </a>
+                    
+                    <a href="{% url 'register' %}" class="flex items-center justify-center space-x-2 w-full px-4 py-3 bg-gradient-to-r from-amber-500 to-yellow-600 text-white rounded-lg hover:from-amber-600 hover:to-yellow-700 transition-all duration-300 group">
+                        <i class="fas fa-user-plus text-white"></i>
+                        <span class="font-semibold">Register</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Header Spacer -->
+<div class="h-20"></div>
+
+<!-- Premium Header Styles & JavaScript -->
+<style>
+    /* Import Premium Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    
+    /* Apply Premium Typography */
+    #ghostHeader {
+        font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
+    /* Enhanced Navigation Links */
+    .nav-link:hover {
+        transform: translateY(-1px);
+    }
+    
+    /* Active Page Styling */
+    .nav-link.active {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+    
+    .nav-link.active i,
+    .nav-link.active span {
+        color: white !important;
+    }
+    
+    /* Mobile Menu Animation */
+    #mobileMenu.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Hamburger Animation */
+    #mobileMenuBtn.active .space-y-1\.5 > div:first-child {
+        transform: rotate(45deg) translateY(8px);
+    }
+    
+    #mobileMenuBtn.active .space-y-1\.5 > div:nth-child(2) {
+        opacity: 0;
+    }
+    
+    #mobileMenuBtn.active .space-y-1\.5 > div:last-child {
+        transform: rotate(-45deg) translateY(-8px);
+    }
+    
+    /* Header Scroll Effect */
+    #ghostHeader.scrolled {
+        background: rgba(255, 255, 255, 0.98);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Premium Glow Effects */
+    .nav-link:hover {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+    }
+    
+    /* Responsive Typography */
+    @media (max-width: 768px) {
+        #ghostHeader h1 {
+            font-size: 1.5rem;
+        }
+        
+        #ghostHeader .text-xs {
+            font-size: 0.65rem;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const header = document.getElementById('ghostHeader');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
+    
+    // Header scroll effect
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 20) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+    
+    // Mobile menu toggle
+    mobileMenuBtn.addEventListener('click', function() {
+        mobileMenuBtn.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+    });
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!header.contains(e.target)) {
+            mobileMenuBtn.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        }
+    });
+    
+    // Close mobile menu when clicking nav links
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', function() {
+            mobileMenuBtn.classList.remove('active');
+            mobileMenu.classList.remove('active');
+        });
+    });
+    
+    // Highlight active page
+    const currentPath = window.location.pathname;
+    navLinks.forEach(link => {
+        if (link.getAttribute('href') === currentPath) {
+            link.classList.add('active');
+        }
+    });
+    
+    // Smooth hover effects for logo
+    const logo = document.querySelector('.group');
+    logo.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.05)';
+    });
+    
+    logo.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+    });
+});
+</script>

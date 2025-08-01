@@ -1,0 +1,394 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GHOST - AI-Driven Identity Shield{% endblock %}</title>
+    
+    <!-- Core Stylesheets -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Ghost Premium Loading Animation Styles -->
+    <style>
+        :root {
+            --primary-dark: #111827;
+            --secondary-dark: #1e293b;
+            --ghost-blue: #00E0FF;
+            --ghost-purple: #7F5AF0;
+            --ghost-coral: #FF7F50;
+            --ghost-gray: #4B5563;
+            --text-light: #f8fafc;
+        }
+
+        /* Premium Ghost Loading Animation */
+        #ghost-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #ghost-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Ghost Pulse Animation */
+        .ghost-pulse {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+        }
+
+        .ghost-pulse::before,
+        .ghost-pulse::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            animation: ghost-pulse-animation 2s ease-in-out infinite;
+        }
+
+        .ghost-pulse::before {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--ghost-blue), var(--ghost-purple));
+            box-shadow: 0 0 40px var(--ghost-blue), 0 0 80px var(--ghost-purple);
+            animation-delay: 0s;
+        }
+
+        .ghost-pulse::after {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--ghost-purple), var(--ghost-coral));
+            box-shadow: 0 0 30px var(--ghost-purple), 0 0 60px var(--ghost-coral);
+            animation-delay: -1s;
+        }
+
+        /* Ghost Icon in Center */
+        .ghost-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            color: white;
+            z-index: 10;
+            animation: ghost-float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+        }
+
+        /* Loading Text */
+        .ghost-loading-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: ghost-text-pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(127, 90, 240, 0.3);
+        }
+
+        /* Scanning Lines Effect */
+        .ghost-scan-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                transparent 40%,
+                rgba(0, 224, 255, 0.1) 50%,
+                transparent 60%
+            );
+            animation: ghost-scan 3s linear infinite;
+        }
+
+        /* Keyframe Animations */
+        @keyframes ghost-pulse-animation {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 1;
+            }
+        }
+
+        @keyframes ghost-float {
+            0%, 100% {
+                transform: translate(-50%, -50%) translateY(0px);
+            }
+            50% {
+                transform: translate(-50%, -50%) translateY(-10px);
+            }
+        }
+
+        @keyframes ghost-text-pulse {
+            0%, 100% {
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes ghost-scan {
+            0% {
+                transform: translateY(-100%);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        /* Particle Effects */
+        .ghost-particles {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .ghost-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--ghost-blue);
+            border-radius: 50%;
+            animation: ghost-particle-float 4s ease-in-out infinite;
+            box-shadow: 0 0 10px var(--ghost-blue);
+        }
+
+        .ghost-particle:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+        .ghost-particle:nth-child(2) { top: 20%; left: 80%; animation-delay: 0.5s; }
+        .ghost-particle:nth-child(3) { top: 80%; left: 10%; animation-delay: 1s; }
+        .ghost-particle:nth-child(4) { top: 70%; left: 70%; animation-delay: 1.5s; }
+        .ghost-particle:nth-child(5) { top: 40%; left: 90%; animation-delay: 2s; }
+        .ghost-particle:nth-child(6) { top: 90%; left: 40%; animation-delay: 2.5s; }
+
+        @keyframes ghost-particle-float {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Premium Ghost Loading Animation -->
+    <div id="ghost-loader">
+        <!-- Scanning Lines Effect -->
+        <div class="ghost-scan-lines"></div>
+        
+        <!-- Floating Particles -->
+        <div class="ghost-particles">
+            <div class="ghost-particle"></div>
+            <div class="ghost-particle"></div>
+            <div class="ghost-particle"></div>
+            <div class="ghost-particle"></div>
+            <div class="ghost-particle"></div>
+            <div class="ghost-particle"></div>
+        </div>
+        
+        <!-- Main Pulse Animation -->
+        <div class="ghost-pulse">
+            <i class="fas fa-ghost ghost-icon"></i>
+        </div>
+        
+        <!-- Loading Text -->
+        <div class="ghost-loading-text" id="ghost-loading-text">
+            Analyzing...
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" style="opacity: 0; transition: opacity 0.5s ease;">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Ghost Loading Animation JavaScript -->
+    <script>
+        class GhostLoader {
+            constructor() {
+                this.loader = document.getElementById('ghost-loader');
+                this.mainContent = document.getElementById('main-content');
+                this.loadingText = document.getElementById('ghost-loading-text');
+                this.isLoading = true;
+                this.loadingTexts = [
+                    'Analyzing...',
+                    'Processing...',
+                    'Scanning...',
+                    'Authenticating...',
+                    'Validating...',
+                    'Loading...'
+                ];
+                this.currentTextIndex = 0;
+                
+                this.init();
+            }
+
+            init() {
+                // Start rotating loading text
+                this.rotateLoadingText();
+                
+                // Hide loader after initial page load
+                window.addEventListener('load', () => {
+                    setTimeout(() => this.hideLoader(), 1000);
+                });
+
+                // Show loader for form submissions
+                this.attachFormListeners();
+                
+                // Show loader for navigation
+                this.attachNavigationListeners();
+                
+                // Show loader for AJAX requests
+                this.attachAjaxListeners();
+            }
+
+            showLoader(text = 'Loading...') {
+                this.isLoading = true;
+                this.loadingText.textContent = text;
+                this.loader.classList.remove('hidden');
+                this.mainContent.style.opacity = '0.3';
+                document.body.style.overflow = 'hidden';
+            }
+
+            hideLoader() {
+                this.isLoading = false;
+                this.loader.classList.add('hidden');
+                this.mainContent.style.opacity = '1';
+                document.body.style.overflow = 'auto';
+            }
+
+            rotateLoadingText() {
+                if (this.isLoading) {
+                    setInterval(() => {
+                        if (this.isLoading) {
+                            this.currentTextIndex = (this.currentTextIndex + 1) % this.loadingTexts.length;
+                            this.loadingText.textContent = this.loadingTexts[this.currentTextIndex];
+                        }
+                    }, 1500);
+                }
+            }
+
+            attachFormListeners() {
+                // File upload forms
+                document.addEventListener('submit', (e) => {
+                    const form = e.target;
+                    if (form.tagName === 'FORM') {
+                        const hasFileInput = form.querySelector('input[type="file"]');
+                        if (hasFileInput) {
+                            this.showLoader('Uploading...');
+                        } else if (form.action.includes('analyze')) {
+                            this.showLoader('Analyzing...');
+                        } else if (form.action.includes('login')) {
+                            this.showLoader('Authenticating...');
+                        } else {
+                            this.showLoader('Processing...');
+                        }
+                    }
+                });
+            }
+
+            attachNavigationListeners() {
+                // Page navigation
+                document.addEventListener('click', (e) => {
+                    const link = e.target.closest('a');
+                    if (link && !link.href.startsWith('#') && !link.href.includes('javascript:') && 
+                        !link.target === '_blank' && link.hostname === window.location.hostname) {
+                        this.showLoader('Loading...');
+                    }
+                });
+            }
+
+            attachAjaxListeners() {
+                // Override fetch for AJAX requests
+                const originalFetch = window.fetch;
+                window.fetch = (...args) => {
+                    const url = args[0];
+                    if (typeof url === 'string') {
+                        if (url.includes('analyze')) {
+                            this.showLoader('Analyzing...');
+                        } else if (url.includes('upload')) {
+                            this.showLoader('Uploading...');
+                        } else {
+                            this.showLoader('Processing...');
+                        }
+                    }
+                    
+                    return originalFetch.apply(this, args).finally(() => {
+                        setTimeout(() => this.hideLoader(), 500);
+                    });
+                };
+
+                // Override XMLHttpRequest for AJAX requests
+                const originalXHROpen = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function(...args) {
+                    this.addEventListener('loadstart', () => {
+                        window.ghostLoader.showLoader('Processing...');
+                    });
+                    this.addEventListener('loadend', () => {
+                        setTimeout(() => window.ghostLoader.hideLoader(), 500);
+                    });
+                    return originalXHROpen.apply(this, args);
+                };
+            }
+        }
+
+        // Initialize Ghost Loader
+        window.ghostLoader = new GhostLoader();
+
+        // Expose methods for manual control
+        window.showGhostLoader = (text) => window.ghostLoader.showLoader(text);
+        window.hideGhostLoader = () => window.ghostLoader.hideLoader();
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

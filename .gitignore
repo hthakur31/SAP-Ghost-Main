@@ -1,0 +1,109 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Node.js (if using)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Static files (if collected)
+staticfiles/
+static_collected/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Secret keys and configurations
+secrets.json
+.secrets
+
+# Large datasets and pretrained models
+Voice_Dataset/
+pretrained_models/
+
+# Large model files but keep metadata
+trained_models/*.pkl
+trained_models/*.joblib
+!trained_models/model_metadata.json
+
+# Media files (keep structure but exclude large files)
+media/deepfake_videos/
+media/voice_analysis/
+media/**/*.mp3
+media/**/*.wav
+media/**/*.webm
+media/**/*.mp4
+
+# Test results and temporary files
+test_results.json
+*.tmp
+*.temp
+*.bak
+
+# Specific test files (keep essential ones)
+simple_test.py
+test_django_integration.py
+test_django_voice_integration.py
+test_real_audio.py
+final_django_test.py
+
+# Keep important training scripts but exclude some test ones
+download_dataset.py
+train_simple_voice_detector.py
+train_voice_clone_detector.py

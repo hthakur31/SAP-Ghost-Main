@@ -1,0 +1,824 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose the Right Plan for You | GHOST Pricing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.4/dist/framer-motion.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    
+    <style>
+        :root {
+            --jet-black: #000000;
+            --metallic-gold: #D4AF37;
+            --neon-aqua: #0FF0FC;
+            --silver: #C0C0C0;
+            --deep-purple: #4A0E4E;
+            --electric-blue: #0033FF;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .pricing-card {
+            background: linear-gradient(145deg, 
+                rgba(15, 23, 42, 0.95) 0%, 
+                rgba(30, 41, 59, 0.9) 50%, 
+                rgba(51, 65, 85, 0.95) 100%);
+            border: 2px solid;
+            border-image: linear-gradient(45deg, 
+                rgba(59, 130, 246, 0.4), 
+                rgba(147, 51, 234, 0.4), 
+                rgba(59, 130, 246, 0.4)) 1;
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 8px 16px rgba(59, 130, 246, 0.1),
+                0 0 40px rgba(147, 51, 234, 0.05);
+            backdrop-filter: blur(20px);
+            transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.1), 
+                transparent);
+            transition: left 0.8s ease;
+            z-index: 1;
+        }
+        
+        .pricing-card:hover::before {
+            left: 100%;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-16px) scale(1.03);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1),
+                0 35px 70px rgba(0, 0, 0, 0.4),
+                0 20px 40px rgba(59, 130, 246, 0.3),
+                0 10px 20px rgba(147, 51, 234, 0.2),
+                0 0 60px rgba(59, 130, 246, 0.15);
+            border-image: linear-gradient(45deg, 
+                rgba(59, 130, 246, 0.8), 
+                rgba(147, 51, 234, 0.8), 
+                rgba(244, 63, 94, 0.6)) 1;
+        }
+        
+        .popular-badge {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            animation: glow-pulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow-pulse {
+            from { box-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
+            to { box-shadow: 0 0 25px rgba(59, 130, 246, 0.8), 0 0 35px rgba(59, 130, 246, 0.6); }
+        }
+        
+        .gradient-button {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .gradient-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .gradient-button:hover::before {
+            left: 100%;
+        }
+        
+        .gradient-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
+        }
+        
+        .pricing-toggle {
+            background: linear-gradient(145deg, 
+                rgba(30, 41, 59, 0.8) 0%, 
+                rgba(51, 65, 85, 0.8) 100%);
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            border-radius: 50px;
+            padding: 4px;
+            position: relative;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .toggle-slider {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899);
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 4px 12px rgba(59, 130, 246, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        .ripple-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple-effect::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .ripple-effect:hover::after {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .feature-highlight {
+            color: var(--neon-aqua);
+            text-shadow: 0 0 10px var(--neon-aqua);
+        }
+        
+        .price-display {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-enter {
+            animation: slideInUp 0.6s ease-out forwards;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .testimonial-card {
+            background: linear-gradient(145deg, #0f0f0f 0%, #2a2a2a 100%);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+        }
+        
+        .logo-grid {
+            filter: grayscale(100%) opacity(0.7);
+            transition: filter 0.3s ease;
+        }
+        
+        .logo-grid:hover {
+            filter: grayscale(0%) opacity(1);
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Premium Header -->
+    {% include 'partials/header.html' %}
+    
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 relative overflow-hidden">
+        <!-- Premium Background with Gradient -->
+        <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent"></div>
+        
+        <!-- Floating Elements -->
+        <div class="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-400/10 to-purple-600/10 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-gradient-to-r from-purple-400/10 to-pink-600/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <div class="animate__animated animate__fadeInUp">
+                <!-- Premium Icon -->
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-600/20 backdrop-blur-sm border border-white/10 mb-8 mx-auto">
+                    <i class="fas fa-crown text-3xl text-transparent bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text"></i>
+                </div>
+                
+                <!-- Main Title -->
+                <h1 class="text-5xl md:text-7xl font-black mb-8 leading-tight">
+                    Choose the <span class="price-display bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">Right Plan</span> for You
+                </h1>
+                
+                <!-- Subtitle with Better Spacing -->
+                <div class="max-w-5xl mx-auto mb-12">
+                    <p class="text-xl md:text-2xl text-gray-300 leading-relaxed mb-6">
+                        Flexible AI security solutions tailored for individuals, businesses, and government sectors.
+                    </p>
+                    <p class="text-lg text-gray-400 leading-relaxed">
+                        Start protecting your digital identity today with enterprise-grade security.
+                    </p>
+                </div>
+                
+                <!-- Premium Stats Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16">
+                    <div class="glassmorphism rounded-2xl p-6 border border-white/10">
+                        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text mb-2">99.9%</div>
+                        <div class="text-sm text-gray-400">Uptime SLA</div>
+                    </div>
+                    <div class="glassmorphism rounded-2xl p-6 border border-white/10">
+                        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text mb-2">< 0.5s</div>
+                        <div class="text-sm text-gray-400">Response Time</div>
+                    </div>
+                    <div class="glassmorphism rounded-2xl p-6 border border-white/10">
+                        <div class="text-3xl font-bold text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text mb-2">24/7</div>
+                        <div class="text-sm text-gray-400">Expert Support</div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Pricing Toggle -->
+                <div class="flex items-center justify-center mb-16">
+                    <div class="glassmorphism rounded-full p-2 border border-white/20 backdrop-blur-sm">
+                        <div class="flex items-center">
+                            <span class="text-lg px-6 py-3 font-semibold text-gray-300">Monthly</span>
+                            <div class="pricing-toggle flex items-center cursor-pointer mx-4" id="pricingToggle">
+                                <div class="toggle-slider w-14 h-7 flex items-center justify-center transition-transform bg-gradient-to-r from-blue-500 to-purple-600 rounded-full" id="toggleSlider">
+                                    <div class="w-5 h-5 bg-white rounded-full shadow-lg transition-transform"></div>
+                                </div>
+                            </div>
+                            <span class="text-lg px-6 py-3 font-semibold text-gray-300">Yearly</span>
+                        </div>
+                    </div>
+                    <div class="ml-6 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-full shadow-lg border border-green-400/50">
+                        <i class="fas fa-percent mr-2"></i>Save 20%
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing Cards -->
+    <section class="pb-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+                
+                <!-- Freemium Plan -->
+                <div class="pricing-card rounded-3xl p-8 relative card-enter flex flex-col" style="animation-delay: 0.1s;">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-gradient-to-br from-gray-400 to-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-seedling text-white text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 text-white">Freemium</h3>
+                        <p class="text-gray-300 text-sm mb-6">Perfect for getting started</p>
+                        <div class="price-display text-4xl font-black mb-2">
+                            <span id="freemium-price">₹0</span>
+                        </div>
+                        <div class="text-gray-400 text-sm" id="freemium-period">/ month</div>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8 flex-grow">
+                        <li class="flex items-center text-gray-200">
+                            <i class="fas fa-check-circle text-green-400 mr-3 flex-shrink-0"></i>
+                            <span>5 video scans per day</span>
+                        </li>
+                        <li class="flex items-center text-gray-200">
+                            <i class="fas fa-check-circle text-green-400 mr-3 flex-shrink-0"></i>
+                            <span>Basic deepfake detection</span>
+                        </li>
+                        <li class="flex items-center text-gray-200">
+                            <i class="fas fa-check-circle text-green-400 mr-3 flex-shrink-0"></i>
+                            <span>Community support</span>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-times-circle text-gray-500 mr-3 flex-shrink-0"></i>
+                            <span>Real-time alerts</span>
+                        </li>
+                        <li class="flex items-center text-gray-400">
+                            <i class="fas fa-times-circle text-gray-500 mr-3 flex-shrink-0"></i>
+                            <span>API access</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-auto">
+                        <button class="w-full bg-gradient-to-r from-gray-600 to-gray-700 text-white py-4 rounded-xl font-bold hover:from-gray-500 hover:to-gray-600 transition-all ripple-effect">
+                            Get Started Free
+                        </button>
+                        
+                        <div class="text-center mt-4">
+                            <span class="text-xs text-gray-400">Includes ads • No credit card required</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Student Plan -->
+                <div class="pricing-card rounded-3xl p-8 relative card-enter" style="animation-delay: 0.2s;">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-graduation-cap text-white text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Student</h3>
+                        <p class="text-gray-400 text-sm mb-6">Special pricing for students</p>
+                        <div class="price-display text-5xl font-black mb-2">
+                            <span id="student-price">₹99</span>
+                        </div>
+                        <div class="text-gray-400 text-sm" id="student-period">/ month</div>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            50 video scans per day
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            Advanced AI analysis
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            Voice verification
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            Priority support
+                        </li>
+                        <li class="flex items-center text-gray-500">
+                            <i class="fas fa-times-circle mr-3"></i>
+                            API access
+                        </li>
+                    </ul>
+                    
+                    <button class="w-full gradient-button text-white py-4 rounded-xl font-bold ripple-effect relative">
+                        Choose Student Plan
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <span class="text-xs text-gray-500">Valid student ID required</span>
+                    </div>
+                </div>
+                
+                <!-- Business Plan -->
+                <div class="pricing-card rounded-3xl p-8 relative card-enter" style="animation-delay: 0.3s;">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="popular-badge text-black px-6 py-2 rounded-full text-sm font-bold">
+                            MOST POPULAR
+                        </span>
+                    </div>
+                    
+                    <div class="text-center mb-8 mt-4">
+                        <div class="w-20 h-20 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-briefcase text-white text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Business</h3>
+                        <p class="text-gray-400 text-sm mb-6">Perfect for growing companies</p>
+                        <div class="price-display text-5xl font-black mb-2">
+                            <span id="business-price">₹9-15</span>
+                        </div>
+                        <div class="text-gray-400 text-sm" id="business-period">/ verification</div>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle feature-highlight mr-3"></i>
+                            Unlimited video scans
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle feature-highlight mr-3"></i>
+                            Real-time alerts
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle feature-highlight mr-3"></i>
+                            Full API access
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle feature-highlight mr-3"></i>
+                            Dashboard access
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle feature-highlight mr-3"></i>
+                            Priority support
+                        </li>
+                    </ul>
+                    
+                    <button class="w-full gradient-button text-white py-4 rounded-xl font-bold ripple-effect relative">
+                        Start Business Plan
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <span class="text-xs text-green-400">30-day free trial • No setup fees</span>
+                    </div>
+                </div>
+                
+                <!-- Enterprise/Government Plan -->
+                <div class="pricing-card rounded-3xl p-8 relative card-enter" style="animation-delay: 0.4s;">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-shield-alt text-white text-3xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Enterprise</h3>
+                        <p class="text-gray-400 text-sm mb-6">For large organizations</p>
+                        <div class="price-display text-3xl font-black mb-2">
+                            Custom Pricing
+                        </div>
+                        <div class="text-gray-400 text-sm">Contact for quote</div>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            Everything in Business
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            Custom AI models
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            On-premise deployment
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            Dedicated support
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-green-400 mr-3"></i>
+                            SLA guarantees
+                        </li>
+                    </ul>
+                    
+                    <button class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold hover:from-purple-700 hover:to-pink-700 transition-all ripple-effect">
+                        Contact Sales
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <span class="text-xs text-gray-500">Custom SLA • White-label options</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Comparison Table -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black mb-4">Compare All Features</h2>
+                <p class="text-xl text-gray-300">Detailed feature breakdown across all plans</p>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full border border-gray-700 rounded-2xl overflow-hidden">
+                    <thead class="bg-gradient-to-r from-gray-800 to-gray-900">
+                        <tr>
+                            <th class="text-left p-6 font-bold">Features</th>
+                            <th class="text-center p-6 font-bold">Freemium</th>
+                            <th class="text-center p-6 font-bold">Student</th>
+                            <th class="text-center p-6 font-bold text-yellow-400">Business</th>
+                            <th class="text-center p-6 font-bold">Enterprise</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-gray-900/50">
+                        <tr class="border-b border-gray-700">
+                            <td class="p-6 font-semibold">Video Scans</td>
+                            <td class="text-center p-6">5/day</td>
+                            <td class="text-center p-6">50/day</td>
+                            <td class="text-center p-6 text-green-400">Unlimited</td>
+                            <td class="text-center p-6 text-green-400">Unlimited</td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="p-6 font-semibold">Real-time Alerts</td>
+                            <td class="text-center p-6"><i class="fas fa-times text-red-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="p-6 font-semibold">Voice + Liveness Verification</td>
+                            <td class="text-center p-6"><i class="fas fa-times text-red-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="p-6 font-semibold">API Access</td>
+                            <td class="text-center p-6"><i class="fas fa-times text-red-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-times text-red-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                        </tr>
+                        <tr class="border-b border-gray-700">
+                            <td class="p-6 font-semibold">Priority Support</td>
+                            <td class="text-center p-6"><i class="fas fa-times text-red-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-crown text-yellow-400"></i></td>
+                        </tr>
+                        <tr>
+                            <td class="p-6 font-semibold">Custom AI Models</td>
+                            <td class="text-center p-6"><i class="fas fa-times text-red-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-times text-red-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-times text-red-400"></i></td>
+                            <td class="text-center p-6"><i class="fas fa-check text-green-400"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black mb-4">Trusted by Industry Leaders</h2>
+                <p class="text-xl text-gray-300">See what our customers say about GHOST security</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                <div class="testimonial-card rounded-2xl p-8">
+                    <div class="flex items-center mb-6">
+                        <img src="{% static 'images/testimonial1.jpg' %}" alt="Customer" class="w-12 h-12 rounded-full mr-4" onerror="this.style.display='none'">
+                        <div>
+                            <div class="font-bold">Sarah Chen</div>
+                            <div class="text-sm text-gray-400">CISO, TechCorp</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"GHOST's deepfake detection has been instrumental in protecting our digital assets. The accuracy is unmatched."</p>
+                    <div class="flex mt-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card rounded-2xl p-8">
+                    <div class="flex items-center mb-6">
+                        <img src="{% static 'images/testimonial2.jpg' %}" alt="Customer" class="w-12 h-12 rounded-full mr-4" onerror="this.style.display='none'">
+                        <div>
+                            <div class="font-bold">Mark Johnson</div>
+                            <div class="text-sm text-gray-400">Detective, Cyber Crime Unit</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"The API integration was seamless, and the real-time detection capabilities have revolutionized our investigations."</p>
+                    <div class="flex mt-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card rounded-2xl p-8">
+                    <div class="flex items-center mb-6">
+                        <img src="{% static 'images/testimonial3.jpg' %}" alt="Customer" class="w-12 h-12 rounded-full mr-4" onerror="this.style.display='none'">
+                        <div>
+                            <div class="font-bold">Priya Sharma</div>
+                            <div class="text-sm text-gray-400">Security Analyst, FinBank</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 italic">"GHOST saved us from multiple fraud attempts. The voice cloning detection is incredibly sophisticated."</p>
+                    <div class="flex mt-4">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Company Logos -->
+            <div class="text-center">
+                <h3 class="text-2xl font-bold mb-8 text-gray-400">Trusted by 500+ Organizations</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center logo-grid">
+                    <div class="text-center opacity-70 hover:opacity-100 transition-opacity">
+                        <i class="fab fa-microsoft text-4xl text-blue-400"></i>
+                        <div class="text-xs mt-2">Microsoft</div>
+                    </div>
+                    <div class="text-center opacity-70 hover:opacity-100 transition-opacity">
+                        <i class="fab fa-google text-4xl text-red-400"></i>
+                        <div class="text-xs mt-2">Google</div>
+                    </div>
+                    <div class="text-center opacity-70 hover:opacity-100 transition-opacity">
+                        <i class="fab fa-amazon text-4xl text-orange-400"></i>
+                        <div class="text-xs mt-2">Amazon</div>
+                    </div>
+                    <div class="text-center opacity-70 hover:opacity-100 transition-opacity">
+                        <i class="fab fa-apple text-4xl text-gray-400"></i>
+                        <div class="text-xs mt-2">Apple</div>
+                    </div>
+                    <div class="text-center opacity-70 hover:opacity-100 transition-opacity">
+                        <i class="fab fa-meta text-4xl text-blue-600"></i>
+                        <div class="text-xs mt-2">Meta</div>
+                    </div>
+                    <div class="text-center opacity-70 hover:opacity-100 transition-opacity">
+                        <i class="fab fa-spotify text-4xl text-green-400"></i>
+                        <div class="text-xs mt-2">Spotify</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FAQ Section -->
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black mb-4">Frequently Asked Questions</h2>
+                <p class="text-xl text-gray-300">Got questions? We've got answers.</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="bg-gray-900/50 rounded-2xl p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3">What payment methods do you accept?</h3>
+                    <p class="text-gray-300">We accept all major credit cards, PayPal, bank transfers, and cryptocurrency payments for enterprise customers.</p>
+                </div>
+                
+                <div class="bg-gray-900/50 rounded-2xl p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3">Can I change plans anytime?</h3>
+                    <p class="text-gray-300">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any billing differences.</p>
+                </div>
+                
+                <div class="bg-gray-900/50 rounded-2xl p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3">Is there a free trial for business plans?</h3>
+                    <p class="text-gray-300">Yes, we offer a 30-day free trial for our Business plan with full access to all features. No credit card required to start.</p>
+                </div>
+                
+                <div class="bg-gray-900/50 rounded-2xl p-6 border border-gray-700">
+                    <h3 class="text-xl font-bold mb-3">What kind of support do you provide?</h3>
+                    <p class="text-gray-300">We offer 24/7 email support for all plans, priority phone support for Business plans, and dedicated account managers for Enterprise customers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="bg-gradient-to-r from-purple-900 to-blue-900 rounded-3xl p-12 border border-purple-700">
+                <h2 class="text-4xl font-black mb-6">Ready to Secure Your Digital Future?</h2>
+                <p class="text-xl text-gray-300 mb-8">
+                    Join thousands of organizations protecting their digital assets with GHOST's AI-powered security platform.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'register' %}" class="bg-gradient-to-r from-yellow-500 to-orange-600 text-black px-8 py-4 rounded-xl font-bold hover:from-yellow-600 hover:to-orange-700 transition-all transform hover:scale-105 ripple-effect">
+                        Start Free Trial
+                    </a>
+                    <a href="{% url 'login' %}" class="border-2 border-gray-500 text-white px-8 py-4 rounded-xl font-bold hover:border-gray-400 hover:bg-gray-800 transition-all transform hover:scale-105">
+                        Sign In
+                    </a>
+                </div>
+                
+                <div class="mt-8 text-sm text-gray-400">
+                    <p>✓ No setup fees &nbsp;&nbsp;•&nbsp;&nbsp; ✓ Cancel anytime &nbsp;&nbsp;•&nbsp;&nbsp; ✓ 99.9% uptime SLA</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('pricingToggle');
+            const slider = document.getElementById('toggleSlider');
+            let isYearly = false;
+            
+            // Pricing data
+            const pricing = {
+                monthly: {
+                    freemium: '₹0',
+                    student: '₹99',
+                    business: '₹9-15',
+                },
+                yearly: {
+                    freemium: '₹0',
+                    student: '₹499',
+                    business: '₹7-12',
+                }
+            };
+            
+            toggle.addEventListener('click', function() {
+                isYearly = !isYearly;
+                
+                // Animate slider
+                if (isYearly) {
+                    slider.style.transform = 'translateX(100%)';
+                } else {
+                    slider.style.transform = 'translateX(0%)';
+                }
+                
+                // Update prices
+                const period = isYearly ? 'yearly' : 'monthly';
+                const periodText = isYearly ? '/ year' : '/ month';
+                
+                document.getElementById('freemium-price').textContent = pricing[period].freemium;
+                document.getElementById('student-price').textContent = pricing[period].student;
+                document.getElementById('business-price').textContent = pricing[period].business;
+                
+                document.getElementById('freemium-period').textContent = periodText;
+                document.getElementById('student-period').textContent = periodText;
+                document.getElementById('business-period').textContent = isYearly ? '/ verification (yearly)' : '/ verification';
+                
+                // Show estimated savings for yearly
+                if (isYearly) {
+                    // Add savings indicators
+                    const studentCard = document.getElementById('student-price').parentElement;
+                    if (!studentCard.querySelector('.savings-badge')) {
+                        const savingsBadge = document.createElement('div');
+                        savingsBadge.className = 'savings-badge text-green-400 text-sm font-semibold mt-2';
+                        savingsBadge.textContent = 'Save ₹689/year';
+                        studentCard.appendChild(savingsBadge);
+                    }
+                } else {
+                    // Remove savings indicators
+                    const savingsBadges = document.querySelectorAll('.savings-badge');
+                    savingsBadges.forEach(badge => badge.remove());
+                }
+            });
+            
+            // Add ripple effect to buttons
+            document.querySelectorAll('.ripple-effect').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+                    
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple');
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+            
+            // Animate cards on scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.card-enter').forEach(card => {
+                card.style.animationPlayState = 'paused';
+                observer.observe(card);
+            });
+        });
+    </script>
+    
+    <style>
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+    
+    <!-- Footer -->
+    {% include 'partials/footer.html' %}
+</body>
+</html>
