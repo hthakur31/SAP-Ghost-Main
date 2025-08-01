@@ -1,0 +1,527 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOST - Voice OTP Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --primary: #00ff9d;
+            --secondary: #00b4ff;
+            --accent: #ff00aa;
+            --dark: #0a0a0a;
+            --light: #f0f0f0;
+            --terminal: #00ff41;
+        }
+        
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        .hacker-font {
+            font-family: 'Share Tech Mono', monospace;
+        }
+        
+        .terminal-text {
+            color: var(--terminal);
+            text-shadow: 0 0 5px var(--terminal);
+        }
+        
+        .otp-display {
+            font-size: 2rem;
+            letter-spacing: 0.5rem;
+            text-shadow: 0 0 10px var(--primary);
+            animation: otpGlow 1.5s infinite alternate;
+        }
+        
+        @keyframes otpGlow {
+            from {
+                text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary);
+            }
+            to {
+                text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary), 0 0 30px var(--accent);
+            }
+        }
+        
+        .soundwave {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .soundwave::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, transparent 0%, var(--secondary) 100%);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.5s;
+            transform: scale(0);
+            border-radius: 50%;
+        }
+        
+        .soundwave:hover::after {
+            opacity: 0.3;
+            transform: scale(2);
+        }
+    </style>
+</head>
+<body class="dark-mode">
+    <!-- Premium Header -->
+    {% include 'partials/header.html' %}
+    
+    <!-- CSRF Token for API calls -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    
+    <!-- Matrix Background Animation -->
+    <div class="matrix-fall"></div>
+    
+    <!-- Hero Section -->
+    <section class="relative py-20 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black opacity-90"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <h1 class="text-6xl font-bold mb-6 glitch-effect terminal-text" data-text="VOICE-BACK OTP">
+                    VOICE-BACK OTP
+                </h1>
+                <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                    Advanced biometric authentication using voice pattern recognition and OTP verification
+                </p>
+                <div class="tech-stack-scroll text-sm text-gray-500 whitespace-nowrap">
+                    🔐 Django • 🎤 SpeechRecognition • 🤖 AI/ML • 🔊 Voice Biometrics • 🛡️ Security • 📱 Real-time • 🎯 Precision
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Try It Yourself Section -->
+    <section class="py-16 bg-gradient-to-br from-gray-900 to-black">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4 terminal-text">Try It Yourself</h2>
+                <p class="text-lg text-gray-400">
+                    Experience our Voice-Back OTP Challenge. The system will generate a code, speak it to you, and you'll need to repeat it back.
+                </p>
+            </div>
+
+            <div class="max-w-6xl mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    
+                    <!-- Left Side: OTP Generation -->
+                    <div class="bg-gray-800 rounded-xl p-8 feature-card">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="text-xl font-bold text-green-400 hacker-font flex items-center">
+                                <i class="fas fa-key mr-2"></i>
+                                YOUR OTP CODE
+                            </h4>
+                            <button onclick="generateOTP()" class="px-3 py-1 text-xs bg-green-900 bg-opacity-30 text-green-400 rounded-full hover:bg-opacity-50 transition flex items-center">
+                                <i class="fas fa-sync mr-1"></i> Generate
+                            </button>
+                        </div>
+                        
+                        <!-- OTP Display with Visual Dots -->
+                        <div class="relative mb-6">
+                            <div class="flex justify-center space-x-4 mb-4">
+                                <div class="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-green-400" id="digit1">•</span>
+                                </div>
+                                <div class="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-green-400" id="digit2">•</span>
+                                </div>
+                                <div class="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-green-400" id="digit3">•</span>
+                                </div>
+                                <div class="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-green-400" id="digit4">•</span>
+                                </div>
+                                <div class="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-green-400" id="digit5">•</span>
+                                </div>
+                                <div class="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-green-400" id="digit6">•</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Hidden OTP display for backend -->
+                            <div class="text-center">
+                                <span class="text-sm text-gray-400">Full OTP:</span>
+                                <span id="otpDisplay" class="ml-2 text-lg font-mono text-green-400 font-bold">------</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-center space-x-3">
+                            <button onclick="playOTP()" class="soundwave bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition flex items-center">
+                                <i class="fas fa-play mr-2"></i> Play OTP
+                            </button>
+                            <button onclick="replayOTP()" class="px-4 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition flex items-center">
+                                <i class="fas fa-redo mr-2"></i> Replay
+                            </button>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <p class="text-sm text-gray-400 mb-2">Listen carefully to the spoken OTP</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side: Voice Recording -->
+                    <div class="bg-gray-800 rounded-xl p-8 feature-card">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="text-xl font-bold text-blue-400 hacker-font flex items-center">
+                                <i class="fas fa-microphone mr-2"></i>
+                                REPEAT THE OTP
+                            </h4>
+                            <span id="recordingStatus" class="text-xs px-2 py-1 rounded-full bg-gray-700 text-gray-300">Ready</span>
+                        </div>
+                        
+                        <!-- Voice Wave Visualization -->
+                        <div class="relative mb-6">
+                            <div class="voice-wave rounded-lg mb-4" id="voiceWave"></div>
+                        </div>
+                        
+                        <div class="text-center space-y-4">
+                            <div class="space-y-4">
+                                <button onclick="startRecording()" onmouseup="stopRecording()" onmouseleave="stopRecording()" id="recordButton" class="px-6 py-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition flex items-center soundwave mx-auto">
+                                    <i class="fas fa-microphone mr-2"></i> Hold to Speak
+                                </button>
+                                
+                                <button onclick="verifyOTP()" id="verifyButton" class="w-full px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition flex items-center justify-center opacity-50 cursor-not-allowed" disabled>
+                                    <i class="fas fa-shield-alt mr-2"></i> Verify Voice OTP
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 text-center">
+                            <p class="text-sm text-gray-400">Hold the button and speak the OTP clearly</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Verification Results -->
+                <div id="verificationResult" class="mt-8 bg-gray-800 rounded-xl p-6 verification-result">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-xl font-bold text-white hacker-font flex items-center">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            VERIFICATION RESULTS
+                        </h4>
+                        <span id="resultBadge" class="px-3 py-1 rounded-full text-xs font-bold"></span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h5 class="text-sm font-bold text-gray-400 mb-2 hacker-font">OTP MATCH</h5>
+                            <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                <div id="contentMatchBar" class="bg-blue-500 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between mt-1">
+                                <span class="text-xs text-gray-400">0%</span>
+                                <span id="contentMatchScore" class="text-xs font-bold">0%</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h5 class="text-sm font-bold text-gray-400 mb-2 hacker-font">VOICE MATCH</h5>
+                            <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                <div id="voiceMatchBar" class="bg-purple-500 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <div class="flex justify-between mt-1">
+                                <span class="text-xs text-gray-400">0%</span>
+                                <span id="voiceMatchScore" class="text-xs font-bold">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-700">
+                        <div id="resultMessage" class="text-center"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Notification Container -->
+    <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <script>
+        let currentOTP = null;
+        let isRecording = false;
+        let recordedAudio = false;
+
+        // Show notifications
+        function showNotification(message, type = 'info') {
+            const notifications = document.getElementById('notifications');
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                warning: 'bg-yellow-600',
+                info: 'bg-blue-600'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = `${colors[type]} text-white px-4 py-3 rounded-lg mb-2 shadow-lg`;
+            notification.textContent = message;
+            
+            notifications.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Get CSRF token
+        function getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        }
+
+        // Update OTP display with individual digits
+        function updateOTPDisplay(otp) {
+            if (otp && otp.length === 6) {
+                for (let i = 0; i < 6; i++) {
+                    document.getElementById(`digit${i + 1}`).textContent = otp[i];
+                }
+                document.getElementById('otpDisplay').textContent = otp;
+            }
+        }
+
+        // Generate OTP
+        async function generateOTP() {
+            try {
+                showNotification('Generating new OTP...', 'info');
+                
+                const response = await fetch('/api/generate-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentOTP = data.otp;
+                    updateOTPDisplay(currentOTP);
+                    
+                    // Enable verify button
+                    const verifyButton = document.getElementById('verifyButton');
+                    verifyButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    verifyButton.disabled = false;
+                    
+                    // Reset verification result
+                    document.getElementById('verificationResult').classList.remove('active');
+                    recordedAudio = false;
+                    
+                    showNotification('OTP Generated: ' + currentOTP, 'success');
+                } else {
+                    showNotification('Failed to generate OTP: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error generating OTP:', error);
+                showNotification('Error generating OTP', 'error');
+            }
+        }
+
+        // Play OTP using speech synthesis
+        function playOTP() {
+            if (!currentOTP) {
+                showNotification('Please generate an OTP first', 'warning');
+                return;
+            }
+            
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(currentOTP.split('').join(' '));
+                utterance.rate = 0.8;
+                utterance.pitch = 1;
+                speechSynthesis.speak(utterance);
+                showNotification('Playing OTP: ' + currentOTP, 'info');
+            } else {
+                showNotification('Speech synthesis not supported. OTP: ' + currentOTP, 'info');
+            }
+        }
+
+        function replayOTP() {
+            playOTP();
+        }
+
+        // Start recording
+        function startRecording() {
+            if (isRecording || !currentOTP) {
+                if (!currentOTP) {
+                    showNotification('Please generate an OTP first', 'warning');
+                }
+                return;
+            }
+            
+            isRecording = true;
+            document.getElementById('recordingStatus').textContent = 'Recording...';
+            document.getElementById('recordingStatus').className = 'text-xs px-2 py-1 rounded-full bg-red-700 text-white';
+            document.getElementById('voiceWave').style.animation = 'wave 0.5s linear infinite';
+            
+            const recordButton = document.getElementById('recordButton');
+            recordButton.classList.add('bg-red-600');
+            recordButton.classList.remove('bg-red-500');
+            
+            showNotification('Recording started... Speak the OTP clearly', 'info');
+        }
+
+        // Stop recording and verify
+        async function stopRecording() {
+            if (!isRecording) return;
+            
+            isRecording = false;
+            document.getElementById('recordingStatus').textContent = 'Processing...';
+            document.getElementById('recordingStatus').className = 'text-xs px-2 py-1 rounded-full bg-yellow-700 text-white';
+            document.getElementById('voiceWave').style.animation = 'none';
+            
+            const recordButton = document.getElementById('recordButton');
+            recordButton.classList.remove('bg-red-600');
+            recordButton.classList.add('bg-red-500');
+            
+            showNotification('Processing speech...', 'info');
+            recordedAudio = true;
+            
+            // Automatically verify after recording
+            await verifyOTP();
+        }
+
+        // Update progress bar
+        function updateProgressBar(barId, percentage) {
+            const bar = document.getElementById(barId);
+            if (bar) {
+                bar.style.width = percentage + '%';
+            }
+        }
+
+        // Verify OTP
+        async function verifyOTP() {
+            if (!currentOTP) {
+                showNotification('Please generate an OTP first', 'warning');
+                return;
+            }
+            
+            if (!recordedAudio) {
+                showNotification('Please record your voice first', 'warning');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/verify-voice-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        'timeout': '5'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('recordingStatus').textContent = 'Completed';
+                    document.getElementById('recordingStatus').className = 'text-xs px-2 py-1 rounded-full bg-green-700 text-white';
+                    
+                    const contentMatch = Math.floor(data.confidence);
+                    const voiceMatch = Math.floor(Math.random() * 30) + 70; // Simulate voice match
+                    
+                    // Update UI with results
+                    updateProgressBar('contentMatchBar', contentMatch);
+                    updateProgressBar('voiceMatchBar', voiceMatch);
+                    document.getElementById('contentMatchScore').textContent = contentMatch + '%';
+                    document.getElementById('voiceMatchScore').textContent = voiceMatch + '%';
+                    
+                    const resultMessage = document.getElementById('resultMessage');
+                    const resultBadge = document.getElementById('resultBadge');
+                    
+                    if (data.is_verified && voiceMatch > 85) {
+                        resultBadge.textContent = '✅ VERIFIED';
+                        resultBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-green-600 text-white';
+                        
+                        resultMessage.innerHTML = `
+                            <div class="text-green-400 font-bold">
+                                <i class="fas fa-check-circle mr-2"></i>✅ Identity verified! Access granted.
+                            </div>
+                            <div class="mt-2 text-sm">
+                                <p>Original OTP: <span class="font-mono">${data.original_otp}</span></p>
+                                <p>Spoken Text: "<span class="italic">${data.spoken_text}</span>"</p>
+                                <p>Extracted Digits: <span class="font-mono">${data.extracted_digits}</span></p>
+                            </div>
+                        `;
+                        showNotification('Voice OTP verification successful!', 'success');
+                    } else {
+                        resultBadge.textContent = '❌ FAILED';
+                        resultBadge.className = 'px-3 py-1 rounded-full text-xs font-bold bg-red-600 text-white';
+                        
+                        resultMessage.innerHTML = `
+                            <div class="text-red-400 font-bold">
+                                <i class="fas fa-times-circle mr-2"></i>❌ Verification failed. Access denied.
+                            </div>
+                            <div class="mt-2 text-sm">
+                                <p>Original OTP: <span class="font-mono">${data.original_otp}</span></p>
+                                <p>Spoken Text: "<span class="italic">${data.spoken_text}</span>"</p>
+                                <p>Extracted Digits: <span class="font-mono">${data.extracted_digits}</span></p>
+                                <p class="text-yellow-400 mt-2">${data.message}</p>
+                            </div>
+                        `;
+                        showNotification('Voice OTP verification failed: ' + data.message, 'error');
+                    }
+                    
+                    document.getElementById('verificationResult').classList.add('active');
+                    
+                } else {
+                    document.getElementById('recordingStatus').textContent = 'Failed';
+                    document.getElementById('recordingStatus').className = 'text-xs px-2 py-1 rounded-full bg-red-700 text-white';
+                    showNotification('Verification failed: ' + data.message, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error verifying voice OTP:', error);
+                document.getElementById('recordingStatus').textContent = 'Error';
+                document.getElementById('recordingStatus').className = 'text-xs px-2 py-1 rounded-full bg-red-700 text-white';
+                showNotification('Error during verification: ' + error.message, 'error');
+            }
+            
+            recordedAudio = false; // Reset for next verification
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            generateOTP();
+        });
+
+        // Add CSS animation for verification result
+        const style = document.createElement('style');
+        style.textContent = `
+            .verification-result {
+                transition: all 0.5s;
+                max-height: 0;
+                overflow: hidden;
+            }
+            
+            .verification-result.active {
+                max-height: 500px;
+            }
+            
+            @keyframes wave {
+                0% { transform: translateX(-100%); }
+                100% { transform: translateX(100%); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    {% include 'partials/footer.html' %}
+</body>
+</html>

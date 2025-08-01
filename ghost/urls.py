@@ -31,6 +31,8 @@ urlpatterns = [
     path('deepfake-demo/', views.deepfake_demo, name='deepfake_demo'),
     path('fraud-demo/', views.fraud_demo, name='fraud_demo'),
     path('otp-demo/', views.otp_demo, name='otp_demo'),
+    path('otp-demo-fixed/', views.otp_demo_fixed, name='otp_demo_fixed'),
+    path('simple-otp-demo/', views.simple_otp_demo, name='simple_otp_demo'),
     path('voice-demo/', views.voice_demo, name='voice_demo'),
     path('business-model/', views.business_model, name='business_model'),
     path('pricing/', views.pricing, name='pricing'),
@@ -63,11 +65,21 @@ urlpatterns = [
     path('api/analyze-otp-data/', views.analyze_otp_data, name='analyze_otp_data'),
     path('api/otp-history/', views.get_otp_history, name='get_otp_history'),
     
+    # Voice Back OTP System endpoints
+    path('api/generate-otp/', views.generate_otp, name='generate_otp'),
+    path('api/verify-voice-otp/', views.verify_voice_otp, name='verify_voice_otp'),
+    path('api/voice-otp-history/', views.get_voice_otp_history, name='get_voice_otp_history'),
+    path('api/test-voice-recognition/', views.test_voice_recognition, name='test_voice_recognition'),
+    
     # Unified detection history API
     path('api/all-detection-history/', views.get_all_detection_history, name='get_all_detection_history'),
     
     # Dashboard stats API
     path('api/dashboard-stats/', views.get_dashboard_stats, name='get_dashboard_stats'),
+    
+    # Real-time updates APIs
+    path('api/recent-history/', views.get_recent_history_api, name='get_recent_history_api'),
+    path('api/dashboard-stats-realtime/', views.get_dashboard_stats_api, name='get_dashboard_stats_api'),
     
     # Report download endpoints
     path('api/report/download/<int:log_id>/<str:report_type>/', views.download_analysis_report, name='download_analysis_report'),

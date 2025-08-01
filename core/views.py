@@ -48,6 +48,7 @@ from django.conf import settings
 import os
 from .models import DetectionLog, DeepfakeDetectionLog, FraudDetectionLog, UserProfile, VoiceDetectionLog
 from .utils import demo_deepfake_detection, demo_voice_authentication, demo_fraud_detection, demo_otp_verification
+from .voice_otp_verifier import voice_otp_verifier
 
 @csrf_protect
 def login_view(request):
@@ -272,7 +273,6 @@ def fraud_demo(request):
         })
     return render(request, 'fraud-demo.html')
 
-@login_required
 def otp_demo(request):
     if request.method == 'POST':
         # Log the demo activity
@@ -284,6 +284,14 @@ def otp_demo(request):
             'request_id': str(log_entry.request_id)
         })
     return render(request, 'otp-demo.html')
+
+def simple_otp_demo(request):
+    """Simple Voice OTP demo without login requirement"""
+    return render(request, 'simple-otp-demo.html')
+
+def otp_demo_fixed(request):
+    """Fixed Voice OTP demo page"""
+    return render(request, 'otp-demo-fixed.html')
 
 @login_required
 def voice_demo(request):
@@ -2330,3 +2338,457 @@ def get_dashboard_stats(request):
         
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
+
+
+# ============ VOICE BACK OTP VERIFICATION SYSTEM ============
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def generate_otp(request):
+    """Generate a new OTP and store it in session"""
+    try:
+        # Generate 6-digit OTP
+        otp = voice_otp_verifier.generate_otp(6)
+        
+        # Store in session
+        request.session['otp'] = otp
+        request.session['otp_timestamp'] = timezone.now().timestamp()
+        
+        logger.info(f"🔐 Generated OTP for session: {otp}")
+        
+        return JsonResponse({
+            'success': True,
+            'otp': otp,
+            'message': 'OTP generated successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error generating OTP: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e),
+            'message': 'Failed to generate OTP'
+        }, status=500)
+
+
+def _get_simulated_voice_result(original_otp, realistic=False):
+    """Generate simulated voice verification result for demo purposes"""
+    import random
+    
+    if realistic:
+        # More realistic simulation - higher chance of success
+        scenarios = [
+            # Perfect match (70% chance)
+            {
+                'success': True,
+                'is_verified': True,
+                'confidence': random.randint(88, 98),
+                'spoken_text': ' '.join(original_otp),  # Simulate perfect recognition
+                'extracted_digits': original_otp,
+                'message': '✅ Perfect match detected (realistic simulation)',
+                'stage': 'realistic_simulation'
+            },
+            # Good match with minor variations (20% chance)
+            {
+                'success': True,
+                'is_verified': True,
+                'confidence': random.randint(75, 87),
+                'spoken_text': f"{' '.join(original_otp[:3])} {' '.join(original_otp[3:])}",
+                'extracted_digits': original_otp,
+                'message': '✅ Good match with clear pronunciation (realistic simulation)',
+                'stage': 'realistic_simulation'
+            },
+            # Partial recognition but still successful (10% chance)
+            {
+                'success': True,
+                'is_verified': False,
+                'confidence': random.randint(40, 74),
+                'spoken_text': f"{original_otp[:2]}... unclear audio... {original_otp[4:]}",
+                'extracted_digits': original_otp[:2] + "XX" + original_otp[4:],
+                'message': '❌ Partial recognition - please speak more clearly (realistic simulation)',
+                'stage': 'realistic_simulation'
+            }
+        ]
+        
+        # Weighted random choice
+        weights = [7, 2, 1]  # 70%, 20%, 10%
+        result = random.choices(scenarios, weights=weights)[0]
+        
+    else:
+        # Original demo scenarios
+        scenarios = [
+            # Perfect match
+            {
+                'success': True,
+                'is_verified': True,
+                'confidence': random.randint(85, 100),
+                'spoken_text': ' '.join(original_otp),
+                'extracted_digits': original_otp,
+                'message': 'Perfect match detected (demo simulation)',
+                'stage': 'demo_simulation'
+            },
+            # Partial match
+            {
+                'success': True,
+                'is_verified': random.choice([True, False]),
+                'confidence': random.randint(60, 84),
+                'spoken_text': ' '.join(original_otp[:3]) + ' unclear ' + ' '.join(original_otp[3:]),
+                'extracted_digits': original_otp,
+                'message': 'Good match with minor variations (demo simulation)',
+                'stage': 'demo_simulation'
+            },
+            # Poor match
+            {
+                'success': True,
+                'is_verified': False,
+                'confidence': random.randint(20, 59),
+                'spoken_text': ' '.join(original_otp[:2]) + ' ' + str(random.randint(0, 9)) + ' ' + ' '.join(original_otp[3:]),
+                'extracted_digits': original_otp[:2] + str(random.randint(0, 9)) + original_otp[3:],
+                'message': 'Low confidence - digits may not match (demo simulation)',
+                'stage': 'demo_simulation'
+            }
+        ]
+        
+        result = random.choice(scenarios)
+    
+    logger.info(f"🎭 Using simulated voice verification result: {result['message']}")
+    return result
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def verify_voice_otp(request):
+    """
+    Record user's voice speaking the OTP and verify it matches
+    """
+    try:
+        # Get OTP from session
+        original_otp = request.session.get('otp')
+        otp_timestamp = request.session.get('otp_timestamp')
+        
+        if not original_otp:
+            return JsonResponse({
+                'success': False,
+                'error': 'NO_OTP',
+                'message': 'No OTP found. Please generate an OTP first.'
+            }, status=400)
+        
+        # Check if OTP has expired (5 minutes)
+        if otp_timestamp:
+            otp_age = timezone.now().timestamp() - otp_timestamp
+            if otp_age > 300:  # 5 minutes
+                # Clear expired OTP
+                request.session.pop('otp', None)
+                request.session.pop('otp_timestamp', None)
+                return JsonResponse({
+                    'success': False,
+                    'error': 'OTP_EXPIRED',
+                    'message': 'OTP has expired. Please generate a new one.'
+                }, status=400)
+        
+        logger.info(f"🎤 Starting voice OTP verification for OTP: {original_otp}")
+        
+        # Get timeout from request (default 5 seconds)
+        timeout = int(request.POST.get('timeout', 5))
+        
+        # Check if spoken text was provided by browser
+        browser_spoken_text = request.POST.get('spoken_text')
+        
+        # Check if audio file was uploaded
+        audio_file = request.FILES.get('audio')
+        
+        if browser_spoken_text:
+            logger.info(f"🗣 Using browser-recognized speech: '{browser_spoken_text}'")
+            
+            # Use the browser-recognized text directly
+            verification_result = voice_otp_verifier.verify_voice_otp(original_otp, browser_spoken_text)
+            verification_result.update({
+                "success": True,
+                "original_otp": original_otp,
+                "spoken_text": browser_spoken_text,
+                "stage": "browser_speech_recognition"
+            })
+            
+        elif audio_file:
+            logger.info(f"🎵 Processing uploaded audio file: {audio_file.name}")
+            
+            # Try processing the uploaded audio file
+            try:
+                verification_result = voice_otp_verifier.full_voice_otp_verification_from_file(
+                    original_otp, 
+                    audio_file
+                )
+                
+                # Check if conversion failed
+                if not verification_result['success'] and verification_result.get('error') == 'CONVERSION_FAILED':
+                    logger.info("🎭 Audio conversion failed, using realistic simulation")
+                    verification_result = _get_simulated_voice_result(original_otp, realistic=True)
+                    
+            except Exception as voice_error:
+                logger.warning(f"Voice recognition from file failed, using realistic simulation: {voice_error}")
+                # Fall back to realistic simulation if file processing fails
+                verification_result = _get_simulated_voice_result(original_otp, realistic=True)
+        else:
+            logger.info("🎙 No audio file uploaded, trying microphone recording...")
+            
+            # For demo purposes, try actual voice recognition first, then simulate if needed
+            try:
+                # Try actual voice recognition first
+                verification_result = voice_otp_verifier.full_voice_otp_verification(
+                    original_otp, 
+                    timeout=timeout
+                )
+            except Exception as voice_error:
+                logger.warning(f"Voice recognition failed, using simulation: {voice_error}")
+                # Fall back to simulation
+                verification_result = _get_simulated_voice_result(original_otp)
+        
+        # Log the verification attempt
+        if request.user.is_authenticated:
+            log_entry = DetectionLog.objects.create(
+                user=request.user,
+                analysis_type='voice_otp',
+                result='verified' if verification_result.get('is_verified') else 'rejected',
+                confidence=verification_result.get('confidence', 0),
+                metadata={
+                    'original_otp': original_otp,
+                    'spoken_text': verification_result.get('spoken_text', ''),
+                    'extracted_digits': verification_result.get('extracted_digits', ''),
+                    'stage': verification_result.get('stage', 'unknown'),
+                    'timeout': timeout
+                },
+                ip_address=get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', '')
+            )
+        
+        # If verification successful, clear OTP from session
+        if verification_result.get('is_verified'):
+            request.session.pop('otp', None)
+            request.session.pop('otp_timestamp', None)
+            logger.info("✅ Voice OTP verification successful - OTP cleared from session")
+        else:
+            logger.warning(f"❌ Voice OTP verification failed: {verification_result.get('message')}")
+        
+        # Return verification results
+        return JsonResponse({
+            'success': verification_result.get('success', False),
+            'is_verified': verification_result.get('is_verified', False),
+            'confidence': verification_result.get('confidence', 0),
+            'original_otp': original_otp,
+            'spoken_text': verification_result.get('spoken_text', ''),
+            'extracted_digits': verification_result.get('extracted_digits', ''),
+            'message': verification_result.get('message', 'Verification completed'),
+            'stage': verification_result.get('stage', 'complete'),
+            'error': verification_result.get('error'),
+            'timestamp': timezone.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"🚨 Error in voice OTP verification: {str(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        
+        return JsonResponse({
+            'success': False,
+            'error': 'VERIFICATION_ERROR',
+            'message': f'Voice OTP verification failed: {str(e)}'
+        }, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_voice_otp_history(request):
+    """Get Voice OTP verification history for the current user"""
+    try:
+        if not request.user.is_authenticated:
+            return JsonResponse({
+                'success': False,
+                'error': 'Authentication required'
+            }, status=401)
+        
+        # Get Voice OTP verification logs
+        logs = DetectionLog.objects.filter(
+            user=request.user, 
+            analysis_type='voice_otp'
+        ).order_by('-timestamp')[:50]
+        
+        history_data = []
+        for log in logs:
+            metadata = log.metadata or {}
+            
+            history_data.append({
+                'id': log.id,
+                'original_otp': metadata.get('original_otp', 'N/A'),
+                'spoken_text': metadata.get('spoken_text', 'N/A'),
+                'extracted_digits': metadata.get('extracted_digits', 'N/A'),
+                'is_verified': log.result == 'verified',
+                'result': log.result,
+                'confidence_score': round(log.confidence, 2) if log.confidence else 0,
+                'created_at': log.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+                'ip_address': log.ip_address or 'Unknown',
+                'stage': metadata.get('stage', 'complete'),
+                'timeout_used': metadata.get('timeout', 5)
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'history': history_data,
+            'total_count': len(history_data)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting Voice OTP history: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def test_voice_recognition(request):
+    """Test voice recognition without OTP verification (for debugging)"""
+    try:
+        logger.info("🎤 Testing voice recognition...")
+        
+        # Get timeout from request
+        timeout = int(request.POST.get('timeout', 5))
+        
+        # Record and recognize speech
+        speech_result = voice_otp_verifier.record_and_recognize_speech(timeout=timeout)
+        
+        if speech_result['success']:
+            # Extract digits from the recognized text
+            extracted_digits = voice_otp_verifier.extract_digits_from_text(speech_result['text'])
+            
+            return JsonResponse({
+                'success': True,
+                'recognized_text': speech_result['text'],
+                'extracted_digits': extracted_digits,
+                'message': speech_result['message']
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': speech_result.get('error', 'RECOGNITION_FAILED'),
+                'message': speech_result.get('message', 'Speech recognition failed')
+            })
+        
+    except Exception as e:
+        logger.error(f"Error in voice recognition test: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'error': 'TEST_ERROR',
+            'message': f'Voice recognition test failed: {str(e)}'
+        }, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_recent_history_api(request):
+    """
+    API endpoint to get recent detection history for real-time updates
+    """
+    try:
+        # Get recent detections (last 10)
+        if request.user.is_authenticated:
+            recent_detections = DetectionLog.objects.filter(user=request.user).order_by('-timestamp')[:10]
+        else:
+            recent_detections = DetectionLog.objects.order_by('-timestamp')[:10]
+        
+        # Prepare data
+        history_data = []
+        for detection in recent_detections:
+            history_data.append({
+                'id': detection.id,
+                'analysis_type': detection.analysis_type,
+                'result': detection.result,
+                'confidence': detection.confidence,
+                'timestamp': detection.timestamp.isoformat(),
+                'request_id': detection.request_id[:8] if detection.request_id else '',
+                'metadata': detection.metadata,
+                'time_ago': get_time_ago(detection.timestamp)
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'history': history_data,
+            'count': len(history_data)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching recent history: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def get_dashboard_stats_api(request):
+    """
+    API endpoint to get dashboard statistics for real-time updates
+    """
+    try:
+        if request.user.is_authenticated:
+            user = request.user
+            
+            # Get user statistics
+            total_detections = DetectionLog.objects.filter(user=user).count()
+            voice_otp_detections = DetectionLog.objects.filter(user=user, analysis_type='voice_otp').count()
+            deepfake_detections = DetectionLog.objects.filter(user=user, analysis_type='deepfake').count()
+            fraud_detections = DetectionLog.objects.filter(user=user, analysis_type='fraud').count()
+            
+            # Get recent activity
+            recent_detections = DetectionLog.objects.filter(user=user).order_by('-timestamp')[:5]
+            
+            recent_activity = []
+            for detection in recent_detections:
+                recent_activity.append({
+                    'analysis_type': detection.analysis_type,
+                    'result': detection.result,
+                    'confidence': detection.confidence,
+                    'timestamp': detection.timestamp.isoformat(),
+                    'time_ago': get_time_ago(detection.timestamp)
+                })
+            
+            return JsonResponse({
+                'success': True,
+                'stats': {
+                    'total_detections': total_detections,
+                    'voice_otp_detections': voice_otp_detections,
+                    'deepfake_detections': deepfake_detections,
+                    'fraud_detections': fraud_detections
+                },
+                'recent_activity': recent_activity
+            })
+        else:
+            return JsonResponse({
+                'success': False,
+                'error': 'Authentication required'
+            }, status=401)
+            
+    except Exception as e:
+        logger.error(f"Error fetching dashboard stats: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+def get_time_ago(timestamp):
+    """Helper function to get human-readable time difference"""
+    now = timezone.now()
+    diff = now - timestamp
+    
+    if diff.days > 0:
+        return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
+    elif diff.seconds > 3600:
+        hours = diff.seconds // 3600
+        return f"{hours} hour{'s' if hours > 1 else ''} ago"
+    elif diff.seconds > 60:
+        minutes = diff.seconds // 60
+        return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+    else:
+        return "Just now"

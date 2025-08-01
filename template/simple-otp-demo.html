@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Voice OTP Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-900 text-white p-8">
+    <!-- CSRF Token -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold mb-8 text-center">Voice OTP Demo</h1>
+        
+        <!-- Notification Area -->
+        <div id="notifications" class="mb-6"></div>
+        
+        <!-- Main Demo Section -->
+        <div class="bg-gray-800 rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-6">Voice OTP Verification</h2>
+            
+            <!-- Step 1: Generate OTP -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-3">Step 1: Generate OTP</h3>
+                <button onclick="generateOTP()" class="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg">
+                    <i class="fas fa-key mr-2"></i>Generate New OTP
+                </button>
+                <div class="mt-4">
+                    <span class="text-sm text-gray-400">Generated OTP:</span>
+                    <span id="otpDisplay" class="ml-4 text-2xl font-mono text-green-400 font-bold">------</span>
+                </div>
+            </div>
+            
+            <!-- Step 2: Record Voice -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold mb-3">Step 2: Record Voice</h3>
+                <button id="recordButton" onmousedown="startRecording()" onmouseup="stopRecording()" 
+                        class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg">
+                    <i class="fas fa-microphone mr-2"></i>Hold to Record OTP
+                </button>
+                <div class="mt-4">
+                    <span class="text-sm text-gray-400">Status:</span>
+                    <span id="recordingStatus" class="ml-4 px-3 py-1 rounded-full text-xs bg-gray-700 text-gray-300">Ready</span>
+                </div>
+            </div>
+            
+            <!-- Results -->
+            <div id="verificationResult" class="mt-8 p-4 rounded-lg bg-gray-700 hidden">
+                <h3 class="text-lg font-semibold mb-4">Verification Results</h3>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+        
+        <!-- History Section -->
+        <div class="bg-gray-800 rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-6">Recent Verifications</h2>
+            <div id="historyContent">
+                <p class="text-gray-400">No verification history yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentOTP = null;
+        let isRecording = false;
+
+        // Show notifications
+        function showNotification(message, type = 'info') {
+            const notifications = document.getElementById('notifications');
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                warning: 'bg-yellow-600',
+                info: 'bg-blue-600'
+            };
+            
+            const notification = document.createElement('div');
+            notification.className = `${colors[type]} text-white px-4 py-3 rounded-lg mb-2`;
+            notification.textContent = message;
+            
+            notifications.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Get CSRF token
+        function getCsrfToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        }
+
+        // Generate OTP
+        async function generateOTP() {
+            try {
+                const response = await fetch('/api/generate-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentOTP = data.otp;
+                    document.getElementById('otpDisplay').textContent = currentOTP;
+                    showNotification('OTP Generated: ' + currentOTP, 'success');
+                    
+                    // Reset verification result
+                    document.getElementById('verificationResult').classList.add('hidden');
+                } else {
+                    showNotification('Failed to generate OTP: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error generating OTP:', error);
+                showNotification('Error generating OTP', 'error');
+            }
+        }
+
+        // Start recording
+        function startRecording() {
+            if (isRecording || !currentOTP) {
+                if (!currentOTP) {
+                    showNotification('Please generate an OTP first', 'warning');
+                }
+                return;
+            }
+            
+            isRecording = true;
+            document.getElementById('recordingStatus').textContent = 'Recording...';
+            document.getElementById('recordingStatus').className = 'ml-4 px-3 py-1 rounded-full text-xs bg-red-700 text-white';
+            showNotification('Recording started... Speak the OTP clearly', 'info');
+        }
+
+        // Stop recording and verify
+        async function stopRecording() {
+            if (!isRecording) return;
+            
+            isRecording = false;
+            document.getElementById('recordingStatus').textContent = 'Processing...';
+            document.getElementById('recordingStatus').className = 'ml-4 px-3 py-1 rounded-full text-xs bg-yellow-700 text-white';
+            showNotification('Processing speech...', 'info');
+            
+            // Call backend to verify
+            await verifyVoiceOTP();
+        }
+
+        // Verify Voice OTP
+        async function verifyVoiceOTP() {
+            try {
+                const response = await fetch('/api/verify-voice-otp/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken(),
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        'timeout': '5'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('recordingStatus').textContent = 'Completed';
+                    document.getElementById('recordingStatus').className = 'ml-4 px-3 py-1 rounded-full text-xs bg-green-700 text-white';
+                    
+                    // Show results
+                    const resultContent = document.getElementById('resultContent');
+                    const isVerified = data.is_verified;
+                    
+                    resultContent.innerHTML = `
+                        <div class="${isVerified ? 'text-green-400' : 'text-red-400'} font-bold mb-4">
+                            <i class="fas ${isVerified ? 'fa-check-circle' : 'fa-times-circle'} mr-2"></i>
+                            ${isVerified ? '✅ Verification Successful!' : '❌ Verification Failed'}
+                        </div>
+                        <div class="space-y-2 text-sm">
+                            <p><span class="text-gray-400">Original OTP:</span> <span class="font-mono text-green-400">${data.original_otp}</span></p>
+                            <p><span class="text-gray-400">Spoken Text:</span> <span class="italic text-blue-400">"${data.spoken_text}"</span></p>
+                            <p><span class="text-gray-400">Extracted Digits:</span> <span class="font-mono text-yellow-400">${data.extracted_digits}</span></p>
+                            <p><span class="text-gray-400">Confidence:</span> <span class="text-purple-400">${Math.floor(data.confidence)}%</span></p>
+                            ${data.message ? `<p class="text-yellow-400 mt-2">${data.message}</p>` : ''}
+                        </div>
+                    `;
+                    
+                    document.getElementById('verificationResult').classList.remove('hidden');
+                    showNotification(isVerified ? 'Voice OTP verification successful!' : 'Voice OTP verification failed', isVerified ? 'success' : 'error');
+                    
+                    // Load history
+                    loadHistory();
+                    
+                } else {
+                    document.getElementById('recordingStatus').textContent = 'Failed';
+                    document.getElementById('recordingStatus').className = 'ml-4 px-3 py-1 rounded-full text-xs bg-red-700 text-white';
+                    showNotification('Verification failed: ' + data.message, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Error verifying voice OTP:', error);
+                document.getElementById('recordingStatus').textContent = 'Error';
+                document.getElementById('recordingStatus').className = 'ml-4 px-3 py-1 rounded-full text-xs bg-red-700 text-white';
+                showNotification('Error during verification: ' + error.message, 'error');
+            }
+        }
+
+        // Load history
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/voice-otp-history/', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.history && data.history.length > 0) {
+                    const historyContent = document.getElementById('historyContent');
+                    let historyHTML = '';
+                    
+                    data.history.slice(0, 5).forEach(entry => {
+                        const isVerified = entry.is_verified;
+                        historyHTML += `
+                            <div class="bg-gray-700 p-4 rounded-lg mb-4">
+                                <div class="flex justify-between items-start">
+                                    <div class="flex-1">
+                                        <div class="font-semibold ${isVerified ? 'text-green-400' : 'text-red-400'}">
+                                            ${isVerified ? '✅ Verified' : '❌ Failed'}
+                                        </div>
+                                        <div class="text-sm text-gray-300 mt-2">
+                                            <p>OTP: <span class="font-mono">${entry.original_otp}</span></p>
+                                            <p>Spoken: "${entry.spoken_text}"</p>
+                                            <p>Extracted: <span class="font-mono">${entry.extracted_digits}</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-400">
+                                        ${new Date(entry.created_at).toLocaleString()}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    historyContent.innerHTML = historyHTML;
+                } else {
+                    document.getElementById('historyContent').innerHTML = '<p class="text-gray-400">No verification history yet.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            generateOTP();
+            loadHistory();
+        });
+    </script>
+</body>
+</html>
